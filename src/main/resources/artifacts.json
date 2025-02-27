@@ -1,0 +1,19 @@
+[
+  {
+    "artifactid": "2012gizaros",
+    "artifactname": "Golden Amulet",
+    "category": "Jewelry",
+    "civilization": "Ancient Egypt",
+    "discoverylocation": "Giza",
+    "composition": "Gold",
+    "discoverydate": "2012-05-14",
+    "currentplace": "British Museum",
+    "dimensions": {
+      "width": 5,
+      "length": 7,
+      "height": 2
+    },
+    "weight": 150.0,
+    "tags": ["egyptian", "amulet", "gold"]
+  }
+]
