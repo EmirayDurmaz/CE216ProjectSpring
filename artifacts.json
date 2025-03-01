@@ -1,40 +1,16 @@
-[
-    {
-        "civilization": "Ancient Egyptian",
-        "composition": "Granodiorite",
-        "discoverydate": "1799-07-15",
-        "artifactname": "Rosetta Stone",
-        "currentplace": "British Museum",
-        "discoverylocation": "Rosetta, Egypt",
-        "weight": 760,
-        "artifactid": "2012gizaros",
-        "category": "Manuscript",
-        "dimensions": {
-            "width": 72,
-            "length": 114,
-            "height": 28
-        },
-        "tags": [
-            "ancient",
-            "hieroglyphs",
-            "multilingual",
-            "historical"
-        ]
+[{
+    "civilization": "Greek",
+    "composition": "Clay",
+    "discovery_location": "Athens, Greece",
+    "artifact_name": "Ancient Vase",
+    "weight": 3.5,
+    "category": "Pottery",
+    "dimensions": {
+        "width": 30,
+        "height": 50
     },
-    {
-        "civilization": "Greek",
-        "composition": "Clay",
-        "discovery_location": "Athens, Greece",
-        "artifact_name": "Ancient Vase",
-        "weight": 3.5,
-        "category": "Pottery",
-        "dimensions": {
-            "width": 30,
-            "height": 50
-        },
-        "tags": [
-            "antique",
-            "museum"
-        ]
-    }
-]
+    "tags": [
+        "antique",
+        "museum"
+    ]
+}]
