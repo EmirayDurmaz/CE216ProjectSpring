@@ -10,12 +10,18 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+        System.setProperty("apple.awt.fullscreenable", "false");
+
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+
+        // Platform.runLater() kullanmadan doğrudan sahneyi yükle
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
     }
+
     public static void main(String[] args) {
         launch();
     }

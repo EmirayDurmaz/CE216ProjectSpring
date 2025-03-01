@@ -3,7 +3,7 @@
         "civilization": "Ancient Egyptian",
         "composition": "Granodiorite",
         "discoverydate": "1799-07-15",
-        "artifactname": "Rosetta Stone",
+        "artifactname": "a",
         "currentplace": "British Museum",
         "discoverylocation": "Rosetta, Egypt",
         "weight": 760,
@@ -22,19 +22,9 @@
         ]
     },
     {
-        "civilization": "Greek",
-        "composition": "Clay",
-        "discovery_location": "Athens, Greece",
-        "artifact_name": "Ancient Vase",
-        "weight": 3.5,
-        "category": "Pottery",
-        "dimensions": {
-            "width": 30,
-            "height": 50
-        },
-        "tags": [
-            "antique",
-            "museum"
-        ]
+        "civilization": "c",
+        "artifactname": "a",
+        "artifactid": "8",
+        "category": "b"
     }
 ]
