@@ -38,17 +38,23 @@ public class ArtifactCatalogApp extends Application {
         displayArea.setEditable(false);
         displayArea.setPrefHeight(400);
 
-        searchField = new TextField();
-        searchField.setPromptText("Search artifacts...");
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.isEmpty()) {
-                displayArtifacts(artifacts);
-            } else {
-                searchArtifacts(newValue);
-            }
+        // **İsim ve ID için Ayrı Arama Alanları**
+        TextField searchByNameField = new TextField();
+        searchByNameField.setPromptText("Search by Name...");
+
+        TextField searchByIdField = new TextField();
+        searchByIdField.setPromptText("Search by ID...");
+
+        // **Arama Listener'ları**
+        searchByNameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterArtifacts(searchByNameField.getText(), searchByIdField.getText());
         });
 
-        // Butonlar
+        searchByIdField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterArtifacts(searchByNameField.getText(), searchByIdField.getText());
+        });
+
+        // **Butonlar**
         Button addButton = new Button("Add Artifact");
         addButton.setOnAction(e -> showAddArtifactDialog());
 
@@ -74,7 +80,6 @@ public class ArtifactCatalogApp extends Application {
         MenuBar menuBar = new MenuBar();
         Menu helpMenu = new Menu("Help");
 
-        // Menü Öğeleri
         MenuItem documentationItem = new MenuItem("Documentation");
         documentationItem.setOnAction(e -> showDocumentation());
 
@@ -93,13 +98,10 @@ public class ArtifactCatalogApp extends Application {
         helpMenu.getItems().addAll(documentationItem, examplesItem, supportItem, updatesItem, accessibilityItem);
         menuBar.getMenus().add(helpMenu);
 
-        // **Düzen**
-        HBox buttonBox = new HBox(10, addButton, editButton, deleteButton, saveButton, exportButton, importButton, helpButton);
-        //VBox vbox = new VBox(10, menuBar, searchField, displayArea, buttonBox);
-
-
-        //ListView<String> tagListView = new ListView<>();
+        // **Etiket Filtreleme (ListView)**
+        ListView<String> tagListView = new ListView<>();
         tagListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
         // Mevcut artifact'lerdeki tüm benzersiz etiketleri listeye ekle
         Set<String> uniqueTags = new HashSet<>();
         for (int i = 0; i < artifacts.length(); i++) {
@@ -112,33 +114,35 @@ public class ArtifactCatalogApp extends Application {
             }
         }
 
-// Terminale etiketleri yazdır
+        // Terminale etiketleri yazdır
         System.out.println("Available Tags: " + uniqueTags);
 
-// Eğer hiç etiket bulunamazsa kullanıcıya mesaj göster
+        // Eğer hiç etiket bulunamazsa kullanıcıya mesaj göster
         if (uniqueTags.isEmpty()) {
             uniqueTags.add("No tags available");
         }
 
         tagListView.getItems().clear(); // Önce temizle
         tagListView.getItems().addAll(uniqueTags);
+
+        // **Filtreleme Butonu**
         Button filterButton = new Button("Filter by Tags");
         filterButton.setOnAction(e -> filterArtifactsByTags(tagListView.getSelectionModel().getSelectedItems()));
 
-
-        VBox searchBox = new VBox(5, new Label("Search Artifacts"), searchField);
+        // **Arama ve Filtreleme Layout'ları**
+        VBox searchBox = new VBox(5, new Label("Search Artifacts"), searchByNameField, searchByIdField);
         VBox filterBox = new VBox(5, new Label("Filter by Tags"), tagListView, filterButton);
 
-
+        // **Üst Kısım (Arama ve Filtreleme)**
         HBox controls = new HBox(20, searchBox, filterBox);
-        VBox vbox = new VBox(10, buttonBox, controls, displayArea);
 
-
+        // **Ana Layout**
+        VBox vbox = new VBox(10, menuBar, controls, displayArea, addButton, editButton, deleteButton, saveButton, exportButton, importButton, helpButton);
         vbox.setPadding(new Insets(10));
 
         Scene scene = new Scene(vbox, 800, 600);
 
-        // **f1 Tuşuna Basılınca Help Penceresini Aç**
+        // **F1 Tuşuna Basılınca Help Penceresini Aç**
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F1) {
                 showDocumentation();
@@ -148,6 +152,35 @@ public class ArtifactCatalogApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
+    private void filterArtifacts(String nameQuery, String idQuery) {
+        JSONArray filteredArtifacts = new JSONArray();
+        nameQuery = nameQuery.trim().toLowerCase();
+        idQuery = idQuery.trim().toLowerCase();
+
+        for (int i = 0; i < artifacts.length(); i++) {
+            JSONObject artifact = artifacts.getJSONObject(i);
+            String artifactName = artifact.optString("artifactname", "").toLowerCase();
+            String artifactId = artifact.optString("artifactid", "").toLowerCase();
+
+            boolean matchesId = !idQuery.isEmpty() && artifactId.contains(idQuery);
+            boolean matchesName = !nameQuery.isEmpty() && artifactName.contains(nameQuery);
+
+            // **Eğer kullanıcı bir şey girdiyse ve o değer bir artifact içinde varsa ekle**
+            if (matchesId || matchesName) {
+                filteredArtifacts.put(artifact);
+            }
+        }
+
+        // **Eğer kullanıcı her iki alanı da boş bıraktıysa hiçbir şey göstermeyelim**
+        if (nameQuery.isEmpty() && idQuery.isEmpty()) {
+            displayArtifacts(new JSONArray()); // Boş liste göster
+        } else {
+            displayArtifacts(filteredArtifacts);
+        }
+    }
+
+
 
     // **Help Butonu İçin Bilgi Penceresi**
     private void showBasicHelp() {
