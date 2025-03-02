@@ -1,8 +1,5 @@
 package com.example.ce216project;
-
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
@@ -50,9 +47,9 @@ public class ArtifactCatalogController {
     @FXML
     private void handleImport() {
         if (app != null) {
-            Stage stage = (Stage) displayArea.getScene().getWindow(); // Sahneyi al
-            app.importJsonFile(stage); // JSON dosyasını yükle
-            app.displayArtifacts(app.getArtifacts()); // Ekrana yazdır
+            Stage stage = (Stage) displayArea.getScene().getWindow();
+            app.importJsonFile(stage);
+            app.displayArtifacts(app.getArtifacts());
         } else {
             System.out.println("ArtifactCatalogApp bağlantısı yok!");
         }
@@ -80,17 +77,17 @@ public class ArtifactCatalogController {
 
     public void displayArtifacts(JSONArray artifacts) {
         Platform.runLater(() -> {
-            artifactContainer.getChildren().clear(); // Önceki verileri temizle
+            artifactContainer.getChildren().clear();
 
             for (int i = 0; i < artifacts.length(); i++) {
                 JSONObject artifact = artifacts.getJSONObject(i);
 
-                // Başlık (Eserin Adı ve ID'si)
+
                 Label title = new Label("🆔 " + artifact.optString("artifactid", "N/A") +
                         " - " + artifact.optString("artifactname", "N/A"));
                 title.equals("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #333;");
 
-                // Detay Bilgiler
+
                 Label details = new Label(
                         "📂 Category: " + artifact.optString("category", "N/A") +
                                 "\n🏛 Civilization: " + artifact.optString("civilization", "N/A") +
@@ -100,7 +97,7 @@ public class ArtifactCatalogController {
                                 "\n🏛 Current Place: " + artifact.optString("currentplace", "Unknown"));
                 details.equals("-fx-font-size: 12px; -fx-text-fill: #555;");
 
-                // Kartın Arka Planı
+
                 VBox card = new VBox(5, title, details);
                 card.setPadding(new Insets(15));
                 card.setStyle("-fx-background-color: #ffffff; " +

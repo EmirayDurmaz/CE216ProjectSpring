@@ -1,54 +1,47 @@
-/* Sidebar Arka Planı */
+
 #sidebar {
-    -fx-background-color: #6A5ACD; /* Açık Mor */
-    -fx-padding: 50px 10px 20px 10px; /* Daha yukarı taşı */
-    -fx-spacing: 20px; /* Butonlar arası boşluk */
+    -fx-background-color: #6A5ACD;
+    -fx-padding: 50px 10px 20px 10px;
+    -fx-spacing: 20px;
     -fx-alignment: center;
 }
-
-/* Genel Buton Stili */
 .button {
-    -fx-background-color: #7A67EE;  /* Orta mor */
-    -fx-text-fill: white;  /* Yazı rengi */
+    -fx-background-color: #7A67EE;
+    -fx-text-fill: white;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-background-radius: 25px; /* Tam yuvarlak yap */
-    -fx-border-radius: 25px; /* Border da yuvarlak olmalı */
+    -fx-background-radius: 25px;
+    -fx-border-radius: 25px;
     -fx-padding: 12px 25px;
     -fx-min-width: 180px;
     -fx-min-height: 45px;
-    -fx-alignment: center-left; /* Yazıyı sola yasla */
-    -fx-border-color: transparent; /* Normalde çerçeve yok */
+    -fx-alignment: center-left;
+    -fx-border-color: transparent;
     -fx-border-width: 0px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 3); /* Hafif gölge efekti */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 3);
     -fx-transition: all 0.3s ease-in-out;
 }
-
-/* Buton Hover (Üzerine Gelince) */
 .button:hover {
-    -fx-background-color: #836FFF; /* Daha açık mor */
-    -fx-border-color: rgba(255, 255, 255, 0.8); /* Beyaz çerçeve (ama hafif şeffaf) */
+    -fx-background-color: #836FFF;
+    -fx-border-color: rgba(255, 255, 255, 0.8);
     -fx-border-width: 3px;
-    -fx-background-radius: 25px; /* Çerçeveyi de yuvarlak yap */
+    -fx-background-radius: 25px;
     -fx-border-radius: 25px;
-    -fx-scale-x: 1.05; /* Hover'da biraz büyüme efekti */
+    -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
 
-/* Buton Aktif (Tıklanırken) */
 .button:pressed {
-    -fx-background-color: #4B0082; /* Daha koyu mor */
+    -fx-background-color: #4B0082;
     -fx-scale-x: 0.95;
     -fx-scale-y: 0.95;
-    -fx-border-width: 0px; /* Tıklayınca çerçeve sıfırlansın */
+    -fx-border-width: 0px;
 }
-
-/* Seçili Buton Stili */
 .selected {
-    -fx-background-color: white; /* Beyaz */
-    -fx-text-fill: #6A5ACD; /* Açık mor yazı */
+    -fx-background-color: white;
+    -fx-text-fill: #6A5ACD;
     -fx-border-color: #6A5ACD;
     -fx-border-width: 2px;
-    -fx-background-radius: 25px; /* Çerçeveyi de yuvarlak yap */
+    -fx-background-radius: 25px;
     -fx-border-radius: 25px;
 }

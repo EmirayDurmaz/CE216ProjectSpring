@@ -2,9 +2,6 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-
-
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <AnchorPane fx:controller="com.example.ce216project.ArtifactCatalogController"
@@ -13,11 +10,8 @@
    <stylesheets>
       <URL value="@style.css"/>
    </stylesheets>
-
-
    <HBox spacing="0" prefWidth="900" prefHeight="600">
 
-      <!-- Sidebar -->
       <VBox fx:id="sidebar" spacing="20" alignment="CENTER">
          <Button fx:id="btnHome" text="🏠 Home" onAction="#handleHome"/>
          <Button fx:id="btnAdd" text="➕ Add Artifact" onAction="#handleAdd"/>
@@ -26,8 +20,6 @@
          <Button fx:id="btnImport" text="📂 Import JSON" onAction="#handleImport"/>
          <Button fx:id="btnExport" text="📤 Export JSON" onAction="#handleExport"/>
       </VBox>
-
-      <!-- İçerik Alanı -->
       <VBox spacing="10">
          <ListView fx:id="artifactListView" prefWidth="600" prefHeight="400"/>
 
@@ -43,7 +35,6 @@
       </VBox>
       <TextArea fx:id="displayArea" prefWidth="600" prefHeight="400"/>
 
-      <!-- Ana İçerik Alanı -->
       <AnchorPane fx:id="contentArea" style="-fx-background-color: #ECF0F1;" prefWidth="700"/>
    </HBox>
 </AnchorPane>
