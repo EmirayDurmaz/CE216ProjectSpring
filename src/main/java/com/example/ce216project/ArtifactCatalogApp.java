@@ -99,7 +99,7 @@ public class ArtifactCatalogApp extends Application {
         menuBar.getMenus().add(helpMenu);
 
         // **Etiket Filtreleme (ListView)**
-        ListView<String> tagListView = new ListView<>();
+        //ListView<String> tagListView = new ListView<>();
         tagListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         // Mevcut artifact'lerdeki tüm benzersiz etiketleri listeye ekle
@@ -532,20 +532,87 @@ public class ArtifactCatalogApp extends Application {
             return;
         }
 
+        // Seçim penceresi oluştur
+        Stage selectionStage = new Stage();
+        selectionStage.initModality(Modality.APPLICATION_MODAL);
+        selectionStage.setTitle("Select Artifacts and Fields to Export");
+
+        // Artifact seçim listesi
+        ListView<String> artifactListView = new ListView<>();
+        for (int i = 0; i < artifacts.length(); i++) {
+            JSONObject artifact = artifacts.getJSONObject(i);
+            String artifactId = artifact.optString("artifactid", "No ID");
+            String artifactName = artifact.optString("artifactname", "Unnamed Artifact");
+            artifactListView.getItems().add(artifactId + " - " + artifactName);
+        }
+        artifactListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        // Alan seçim listesi
+        String[] possibleFields = {"artifactid", "artifactname", "category", "civilization", "discoverylocation", "composition", "discoverydate", "currentplace", "dimensions", "weight", "tags"};
+        ListView<String> fieldListView = new ListView<>();
+        fieldListView.getItems().addAll(possibleFields);
+        fieldListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        // 'Select All' butonu
+        Button selectAllButton = new Button("Select All");
+        selectAllButton.setOnAction(e -> fieldListView.getSelectionModel().selectAll());
+
+        Button exportButton = new Button("Export Selected");
+        exportButton.setOnAction(e -> {
+            ObservableList<String> selectedArtifacts = artifactListView.getSelectionModel().getSelectedItems();
+            ObservableList<String> selectedFields = fieldListView.getSelectionModel().getSelectedItems();
+
+            if (selectedArtifacts.isEmpty() || selectedFields.isEmpty()) {
+                showAlert("Export Error", "Please select at least one artifact and one field to export.");
+                return;
+            }
+            selectionStage.close();
+            saveJsonWithSelectedArtifactsAndFields(stage, selectedArtifacts, selectedFields);
+        });
+
+        VBox layout = new VBox(10, new Label("Select artifacts to export:"), artifactListView,
+                new Label("Select fields to export:"), fieldListView, selectAllButton, exportButton);
+        layout.setPadding(new Insets(10));
+
+        Scene scene = new Scene(layout, 400, 500);
+        selectionStage.setScene(scene);
+        selectionStage.show();
+    }
+
+    private void saveJsonWithSelectedArtifactsAndFields(Stage stage, ObservableList<String> selectedArtifacts, ObservableList<String> selectedFields) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Export JSON File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
         File file = fileChooser.showSaveDialog(stage);
 
         if (file != null) {
+            JSONArray filteredArtifacts = new JSONArray();
+
+            for (int i = 0; i < artifacts.length(); i++) {
+                JSONObject artifact = artifacts.getJSONObject(i);
+                String artifactIdentifier = artifact.optString("artifactid", "No ID") + " - " + artifact.optString("artifactname", "Unnamed Artifact");
+                if (selectedArtifacts.contains(artifactIdentifier)) {
+                    JSONObject filteredArtifact = new JSONObject();
+
+                    for (String field : selectedFields) {
+                        if (artifact.has(field)) {
+                            filteredArtifact.put(field, artifact.get(field));
+                        }
+                    }
+                    filteredArtifacts.put(filteredArtifact);
+                }
+            }
+
             try (FileWriter writer = new FileWriter(file)) {
-                writer.write(artifacts.toString(4));
+                writer.write(filteredArtifacts.toString(4));
                 displayArea.setText("JSON file exported successfully to " + file.getAbsolutePath());
             } catch (IOException e) {
                 displayArea.setText("Error exporting file: " + e.getMessage());
             }
         }
     }
+
+
     private void searchArtifacts(String query) {
         JSONArray filteredArtifacts = new JSONArray();
         String lowerCaseQuery = query.toLowerCase();
