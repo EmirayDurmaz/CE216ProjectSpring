@@ -3,7 +3,9 @@ package com.example.ce216project;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -32,157 +34,26 @@ public class ArtifactCatalogApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Historical Artifact Catalog");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/ce216project/mainui.fxml"));
+            Parent root = loader.load();
 
-        displayArea = new TextArea();
-        displayArea.setEditable(false);
-        displayArea.setPrefHeight(400);
+            // ✅ Controller'ı al ve ArtifactCatalogApp nesnesini ilet
+            ArtifactCatalogController controller = loader.getController();
+            controller.setApp(this); // Controller'a app nesnesini ilet
+            setController(controller); // Controller bağlantısını kaydet
 
-        // **İsim ve ID için Ayrı Arama Alanları**
-        TextField searchByNameField = new TextField();
-        searchByNameField.setPromptText("Search by Name...");
-
-        TextField searchByIdField = new TextField();
-        searchByIdField.setPromptText("Search by ID...");
-
-        // **Arama Listener'ları**
-        searchByNameField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterArtifacts(searchByNameField.getText(), searchByIdField.getText());
-        });
-
-        searchByIdField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterArtifacts(searchByNameField.getText(), searchByIdField.getText());
-        });
-
-        // **Butonlar**
-        Button addButton = new Button("Add Artifact");
-        addButton.setOnAction(e -> showAddArtifactDialog());
-
-        Button editButton = new Button("Edit Artifact");
-        editButton.setOnAction(e -> showEditArtifactDialog());
-
-        Button deleteButton = new Button("Delete Artifact");
-        deleteButton.setOnAction(e -> showDeleteArtifactDialog());
-
-        Button saveButton = new Button("Save Imported Artifacts");
-        saveButton.setOnAction(e -> saveImportedArtifacts());
-
-        Button exportButton = new Button("Export JSON File");
-        exportButton.setOnAction(e -> exportJsonFile(primaryStage));
-
-        Button importButton = new Button("Import JSON File");
-        importButton.setOnAction(e -> importJsonFile(primaryStage));
-
-        Button helpButton = new Button("Help");
-        helpButton.setOnAction(e -> showBasicHelp());
-
-        // **Menü Çubuğu**
-        MenuBar menuBar = new MenuBar();
-        Menu helpMenu = new Menu("Help");
-
-        MenuItem documentationItem = new MenuItem("Documentation");
-        documentationItem.setOnAction(e -> showDocumentation());
-
-        MenuItem examplesItem = new MenuItem("Examples");
-        examplesItem.setOnAction(e -> showExamples());
-
-        MenuItem supportItem = new MenuItem("Support Web Site");
-        supportItem.setOnAction(e -> openSupportWebsite());
-
-        MenuItem updatesItem = new MenuItem("Check for Updates");
-        updatesItem.setOnAction(e -> checkForUpdates());
-
-        MenuItem accessibilityItem = new MenuItem("Accessibility");
-        accessibilityItem.setOnAction(e -> showAccessibilityOptions());
-
-        helpMenu.getItems().addAll(documentationItem, examplesItem, supportItem, updatesItem, accessibilityItem);
-        menuBar.getMenus().add(helpMenu);
-
-        // **Etiket Filtreleme (ListView)**
-        //ListView<String> tagListView = new ListView<>();
-        tagListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        // Mevcut artifact'lerdeki tüm benzersiz etiketleri listeye ekle
-        Set<String> uniqueTags = new HashSet<>();
-        for (int i = 0; i < artifacts.length(); i++) {
-            JSONObject artifact = artifacts.getJSONObject(i);
-            if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {
-                JSONArray tagsArray = artifact.getJSONArray("tags");
-                for (int j = 0; j < tagsArray.length(); j++) {
-                    uniqueTags.add(tagsArray.getString(j)); // Benzersiz etiketleri Set'e ekle
-                }
-            }
-        }
-
-        // Terminale etiketleri yazdır
-        System.out.println("Available Tags: " + uniqueTags);
-
-        // Eğer hiç etiket bulunamazsa kullanıcıya mesaj göster
-        if (uniqueTags.isEmpty()) {
-            uniqueTags.add("No tags available");
-        }
-
-        tagListView.getItems().clear(); // Önce temizle
-        tagListView.getItems().addAll(uniqueTags);
-
-        // **Filtreleme Butonu**
-        Button filterButton = new Button("Filter by Tags");
-        filterButton.setOnAction(e -> filterArtifactsByTags(tagListView.getSelectionModel().getSelectedItems()));
-
-        // **Arama ve Filtreleme Layout'ları**
-        VBox searchBox = new VBox(5, new Label("Search Artifacts"), searchByNameField, searchByIdField);
-        VBox filterBox = new VBox(5, new Label("Filter by Tags"), tagListView, filterButton);
-
-        // **Üst Kısım (Arama ve Filtreleme)**
-        HBox controls = new HBox(20, searchBox, filterBox);
-
-        // **Ana Layout**
-        VBox vbox = new VBox(10, menuBar, controls, displayArea, addButton, editButton, deleteButton, saveButton, exportButton, importButton, helpButton);
-        vbox.setPadding(new Insets(10));
-
-        Scene scene = new Scene(vbox, 800, 600);
-
-        // **F1 Tuşuna Basılınca Help Penceresini Aç**
-        scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.F1) {
-                showDocumentation();
-            }
-        });
-
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    private void filterArtifacts(String nameQuery, String idQuery) {
-        JSONArray filteredArtifacts = new JSONArray();
-        nameQuery = nameQuery.trim().toLowerCase();
-        idQuery = idQuery.trim().toLowerCase();
-
-        for (int i = 0; i < artifacts.length(); i++) {
-            JSONObject artifact = artifacts.getJSONObject(i);
-            String artifactName = artifact.optString("artifactname", "").toLowerCase();
-            String artifactId = artifact.optString("artifactid", "").toLowerCase();
-
-            boolean matchesId = !idQuery.isEmpty() && artifactId.contains(idQuery);
-            boolean matchesName = !nameQuery.isEmpty() && artifactName.contains(nameQuery);
-
-            // **Eğer kullanıcı bir şey girdiyse ve o değer bir artifact içinde varsa ekle**
-            if (matchesId || matchesName) {
-                filteredArtifacts.put(artifact);
-            }
-        }
-
-        // **Eğer kullanıcı her iki alanı da boş bıraktıysa hiçbir şey göstermeyelim**
-        if (nameQuery.isEmpty() && idQuery.isEmpty()) {
-            displayArtifacts(new JSONArray()); // Boş liste göster
-        } else {
-            displayArtifacts(filteredArtifacts);
+            Scene scene = new Scene(root, 900, 600);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Artifact Catalog");
+            primaryStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
 
 
-    // **Help Butonu İçin Bilgi Penceresi**
     private void showBasicHelp() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Help");
@@ -194,7 +65,7 @@ public class ArtifactCatalogApp extends Application {
         alert.showAndWait();
     }
 
-    // **Menü Öğeleri İçin İşlevler**
+
     private void showDocumentation() {
         Stage helpStage = new Stage();
         helpStage.initModality(Modality.APPLICATION_MODAL);
@@ -303,24 +174,24 @@ public class ArtifactCatalogApp extends Application {
         TextField tagsField = new TextField();
         tagsField.setPromptText("Tags (comma separated)");
 
-        // **Ekleme Butonu**
+
         Button addButton = new Button("Add Artifact");
         addButton.setOnAction(e -> {
             String artifactId = idField.getText().trim();
 
-            // **ID Boş Bırakıldıysa Uyarı Göster**
+
             if (artifactId.isEmpty()) {
                 showAlert("Error", "Artifact ID is required!");
                 return;
             }
 
-            // **Aynı ID'ye Sahip Artifact Var mı Kontrol Et**
+
             if (isArtifactIdExists(artifactId)) {
                 showAlert("Error", "An artifact with this ID already exists!");
                 return;
             }
 
-            // **Yeni Artifact Nesnesi**
+
             JSONObject newArtifact = new JSONObject();
             newArtifact.put("artifactid", artifactId);
             newArtifact.put("artifactname", nameField.getText().trim().isEmpty() ? "Unknown" : nameField.getText().trim());
@@ -331,17 +202,17 @@ public class ArtifactCatalogApp extends Application {
             newArtifact.put("discoverydate", discoveryDateField.getText().trim().isEmpty() ? "Unknown" : discoveryDateField.getText().trim());
             newArtifact.put("currentplace", currentPlaceField.getText().trim().isEmpty() ? "Unknown" : currentPlaceField.getText().trim());
 
-            // **Boyutlar (JSON Nesnesi İçinde)**
+
             JSONObject dimensions = new JSONObject();
             dimensions.put("width", widthField.getText().trim().isEmpty() ? 0 : Integer.parseInt(widthField.getText().trim()));
             dimensions.put("length", lengthField.getText().trim().isEmpty() ? 0 : Integer.parseInt(lengthField.getText().trim()));
             dimensions.put("height", heightField.getText().trim().isEmpty() ? 0 : Integer.parseInt(heightField.getText().trim()));
             newArtifact.put("dimensions", dimensions);
 
-            // **Ağırlık**
+
             newArtifact.put("weight", weightField.getText().trim().isEmpty() ? 0 : Integer.parseInt(weightField.getText().trim()));
 
-            // **Etiketler (Tags)**
+
             JSONArray tagsArray = new JSONArray();
             String tagsInput = tagsField.getText().trim();
             if (!tagsInput.isEmpty()) {
@@ -352,13 +223,13 @@ public class ArtifactCatalogApp extends Application {
             }
             newArtifact.put("tags", tagsArray);
 
-            // **Artifact'i JSON Dizisine Ekle ve Güncelle**
+
             artifacts.put(newArtifact);
             displayArtifacts(artifacts);
             dialog.close();
         });
 
-        // **Düzen**
+
         VBox layout = new VBox(10, idField, nameField, categoryField, civilizationField, discoveryLocationField,
                 compositionField, discoveryDateField, currentPlaceField, widthField, lengthField, heightField,
                 weightField, tagsField, addButton);
@@ -375,7 +246,7 @@ public class ArtifactCatalogApp extends Application {
                 return true; // Aynı ID zaten var
             }
         }
-        return false; // ID bulunamadı, eklenebilir
+        return false;
     }
 
     private void showEditArtifactDialog() {
@@ -425,7 +296,7 @@ public class ArtifactCatalogApp extends Application {
         result.ifPresent(artifactId -> {
             int indexToRemove = -1;
 
-            // Silinecek artifactin indeksini bul
+
             for (int i = 0; i < artifacts.length(); i++) {
                 JSONObject artifact = artifacts.getJSONObject(i);
                 if (artifact.optString("artifactid").equals(artifactId)) {
@@ -434,7 +305,6 @@ public class ArtifactCatalogApp extends Application {
                 }
             }
 
-            // Eğer indeks bulunduysa artifacti sil
             if (indexToRemove != -1) {
                 artifacts.remove(indexToRemove);
                 displayArtifacts(artifacts);
@@ -482,50 +352,23 @@ public class ArtifactCatalogApp extends Application {
         }
         displayArtifacts(filteredArtifacts);
     }
+    private ArtifactCatalogController controller; // Controller referansı
 
-    private void displayArtifacts(JSONArray artifactsToDisplay) {
-        StringBuilder formattedText = new StringBuilder();
-        for (int i = 0; i < artifactsToDisplay.length(); i++) {
-            JSONObject artifact = artifactsToDisplay.getJSONObject(i);
-
-            formattedText.append("ID: ").append(artifact.optString("artifactid", "N/A")).append("\n");
-            formattedText.append("Name: ").append(artifact.optString("artifactname", "N/A")).append("\n");
-            formattedText.append("Category: ").append(artifact.optString("category", "N/A")).append("\n");
-            formattedText.append("Civilization: ").append(artifact.optString("civilization", "N/A")).append("\n");
-            formattedText.append("Discovery Location: ").append(artifact.optString("discoverylocation", "Unknown")).append("\n");
-            formattedText.append("Composition: ").append(artifact.optString("composition", "Unknown")).append("\n");
-            formattedText.append("Discovery Date: ").append(artifact.optString("discoverydate", "Unknown")).append("\n");
-            formattedText.append("Current Place: ").append(artifact.optString("currentplace", "Unknown")).append("\n");
-
-            // **Boyutları yazdır (Eğer varsa)**
-            if (artifact.has("dimensions")) {
-                JSONObject dimensions = artifact.getJSONObject("dimensions");
-                formattedText.append("Dimensions (W x L x H): ")
-                        .append(dimensions.optInt("width", 0)).append(" x ")
-                        .append(dimensions.optInt("length", 0)).append(" x ")
-                        .append(dimensions.optInt("height", 0)).append(" cm\n");
-            }
-
-            // **Ağırlık ekle (Eğer varsa)**
-            formattedText.append("Weight: ").append(artifact.optInt("weight", 0)).append(" kg\n");
-
-            // **Etiketleri yazdır (Eğer varsa)**
-            if (artifact.has("tags")) {
-                JSONArray tags = artifact.getJSONArray("tags");
-                formattedText.append("Tags: ");
-                for (int j = 0; j < tags.length(); j++) {
-                    formattedText.append(tags.getString(j));
-                    if (j < tags.length() - 1) {
-                        formattedText.append(", ");
-                    }
-                }
-                formattedText.append("\n");
-            }
-
-            formattedText.append("---------------------------------------\n");
-        }
-        displayArea.setText(formattedText.toString());
+    // Controller'ı ayarlamak için metod
+    public void setController(ArtifactCatalogController controller) {
+        this.controller = controller;
     }
+
+    // Display Artifacts güncellendi
+    public void displayArtifacts(JSONArray artifacts) {
+        if (controller != null) {
+            controller.displayArtifacts(artifacts); // Controller üzerinden çağır
+        } else {
+            System.out.println("Controller bağlantısı yok!");
+        }
+    }
+
+
     private void exportJsonFile(Stage stage) {
         if (artifacts.isEmpty()) {
             displayArea.setText("No data to export.");
@@ -609,10 +452,12 @@ public class ArtifactCatalogApp extends Application {
             } catch (IOException e) {
                 displayArea.setText("Error exporting file: " + e.getMessage());
             }
-        }
+}
+}
+
+    public JSONArray getArtifacts() {
+        return artifacts;
     }
-
-
     private void searchArtifacts(String query) {
         JSONArray filteredArtifacts = new JSONArray();
         String lowerCaseQuery = query.toLowerCase();
@@ -672,7 +517,7 @@ public class ArtifactCatalogApp extends Application {
         }
     }
 
-    private void importJsonFile(Stage stage) {
+    public void importJsonFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Import JSON File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
@@ -689,13 +534,12 @@ public class ArtifactCatalogApp extends Application {
                 for (int i = 0; i < newArtifacts.length(); i++) {
                     artifacts.put(newArtifacts.getJSONObject(i));
                 }
+
+                // ✅ JSON dosyası yüklendikten sonra ekrana yazdır
                 displayArtifacts(artifacts);
 
-                // **Etiket Listesini Güncelle**
-                updateTagListView();
-
             } catch (Exception e) {
-                displayArea.setText("Error loading artifacts: " + e.getMessage());
+                System.out.println("Error loading artifacts: " + e.getMessage());
             }
         }
     }
