@@ -23,23 +23,28 @@ public class ArtifactCatalogController {
 
     @FXML
     private void handleHome() {
-        showMessage("Home clicked! Ana ekrana dönülüyor...");
+        showMessage("Home clicked! ...");
     }
 
     @FXML
     private void handleAdd() {
-        showMessage("Add Artifact clicked! Yeni eser ekleme ekranı açılıyor...");
+        showMessage("Add Artifact clicked! ...");
     }
 
     @FXML
     private void handleEdit() {
-        showMessage("Edit Artifact clicked! Düzenleme ekranı açılıyor...");
+        showMessage("Edit Artifact clicked! ...");
     }
 
     @FXML
     private void handleDelete() {
-        showMessage("Delete Artifact clicked! Seçili eser siliniyor...");
+        showMessage("Delete Artifact clicked! S..");
     }
+    @FXML
+    private void handleSearch() {
+        showMessage("Search Artifact clicked! ...");
+    }
+
 
     @FXML
     private TextArea displayArea;
