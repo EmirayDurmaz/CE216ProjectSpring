@@ -114,5 +114,9 @@ public class ArtifactCatalogController {
     private void handleHelp() {
         app.showBasicHelp();
     }
+    @FXML
+    private void handleListArtifacts() {
+        app.displayArtifacts(app.getArtifacts());
+    }
 
 }

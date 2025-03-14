@@ -20,6 +20,7 @@
          <Button fx:id="btnImport" text="📂 Import JSON" onAction="#handleImport"/>
          <Button fx:id="btnExport" text="📤 Export JSON" onAction="#handleExport"/>
          <Button fx:id="btnHelp" text="❓ Help" onAction="#handleHelp"/>
+         <Button fx:id="btnListArtifacts" text="📜 List Artifacts" onAction="#handleListArtifacts"/>
 
       </VBox>
       <VBox spacing="10">
