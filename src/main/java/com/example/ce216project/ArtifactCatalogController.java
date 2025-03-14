@@ -110,5 +110,9 @@ public class ArtifactCatalogController {
         });
     }
 
+    @FXML
+    private void handleHelp() {
+        app.showBasicHelp();
+    }
 
 }

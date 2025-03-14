@@ -54,7 +54,7 @@ public class ArtifactCatalogApp extends Application {
 
 
 
-    private void showBasicHelp() {
+    void showBasicHelp() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Help");
         alert.setHeaderText("How to Use the Software");

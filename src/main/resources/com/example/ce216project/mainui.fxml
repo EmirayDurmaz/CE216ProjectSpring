@@ -19,6 +19,8 @@
          <Button fx:id="btnDelete" text="🗑 Delete Artifact" onAction="#handleDelete"/>
          <Button fx:id="btnImport" text="📂 Import JSON" onAction="#handleImport"/>
          <Button fx:id="btnExport" text="📤 Export JSON" onAction="#handleExport"/>
+         <Button fx:id="btnHelp" text="❓ Help" onAction="#handleHelp"/>
+
       </VBox>
       <VBox spacing="10">
          <ListView fx:id="artifactListView" prefWidth="600" prefHeight="400"/>
