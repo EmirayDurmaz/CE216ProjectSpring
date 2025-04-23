@@ -11,9 +11,9 @@ public class MainView extends Application {
     public void start(Stage primaryStage) {
         TableView<String> tableView = new TableView<>();
 
-        Button addButton = new Button("Yeni Eser Ekle");
+        Button addButton = new Button("Add New Artifact");
         addButton.setOnAction(e -> {
-            // Yeni eser ekleme ekranı açılacak
+
             AddArtifactView.display();
         });
 
@@ -21,7 +21,7 @@ public class MainView extends Application {
         layout.getChildren().addAll(tableView, addButton);
 
         Scene scene = new Scene(layout, 600, 400);
-        primaryStage.setTitle("Tarihi Eser Kataloğu");
+        primaryStage.setTitle("Historical Artifacts Catalogue");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -30,4 +30,3 @@ public class MainView extends Application {
         launch(args);
     }
 }
-
