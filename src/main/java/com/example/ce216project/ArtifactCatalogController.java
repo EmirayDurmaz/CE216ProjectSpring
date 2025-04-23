@@ -187,37 +187,32 @@ public class ArtifactCatalogController {
 
                 VBox card = new VBox();
                 card.setPrefWidth(260);
+                card.setPrefHeight(240);
                 card.setStyle("""
-                -fx-background-color: white;
-                -fx-background-radius: 12;
-                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0.3, 0, 2);
-            """);
+            -fx-background-color: white;
+            -fx-background-radius: 12;
+            -fx-border-radius: 12;
+            -fx-border-color: #CFD8DC;
+            -fx-border-width: 1;
+            -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0.3, 0, 2);
+        """);
 
-                String imagePath = artifact.optString("image", "file:images/artifact_default.jpg");
-                if (!imagePath.startsWith("file:") && !imagePath.startsWith("http")) {
-                    imagePath = "file:" + imagePath;
-                }
+                VBox content = new VBox(10);
+                content.setPadding(new Insets(10));
 
-                ImageView imageView = new ImageView();
-                try {
-                    imageView.setImage(new Image(imagePath));
-                } catch (Exception e) {
-                    imageView.setImage(new Image("file:images/artifact_default.jpg"));
-                }
+                Label title = new Label("🆔 " + artifact.optString("artifactid", "N/A")
+                        + " - " + artifact.optString("artifactname", "N/A"));
+                title.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #263238;");
 
-                imageView.setFitWidth(260);
-                imageView.setFitHeight(180);
-                imageView.setPreserveRatio(true);
-                imageView.setSmooth(true);
-                imageView.setCache(true);
-
-                imageView.setStyle("-fx-alignment: center;");
-
-                Label name = new Label("🏺 " + artifact.optString("artifactname", "N/A"));
-                name.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #263238;");
-
-                Label location = new Label("📍 " + artifact.optString("discoverylocation", "Unknown"));
-                location.setStyle("-fx-font-size: 13px; -fx-text-fill: #455A64;");
+                Label details = new Label(
+                        "📂 " + artifact.optString("category", "N/A") +
+                                "\n🏛 " + artifact.optString("civilization", "N/A") +
+                                "\n📍 " + artifact.optString("discoverylocation", "Unknown") +
+                                "\n🧪 " + artifact.optString("composition", "Unknown") +
+                                "\n📅 " + artifact.optString("discoverydate", "Unknown") +
+                                "\n📌 " + artifact.optString("currentplace", "Unknown"));
+                details.setStyle("-fx-font-size: 13px; -fx-text-fill: #455A64;");
+                details.setWrapText(true);
 
                 StringBuilder tagsText = new StringBuilder("🏷 Tags: ");
                 if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {
@@ -231,55 +226,19 @@ public class ArtifactCatalogController {
                 tagsLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #607D8B;");
                 tagsLabel.setWrapText(true);
 
-                Button detailButton = new Button("Details");
-                detailButton.setStyle("""
-                -fx-background-color: #6C63FF;
-                -fx-text-fill: white;
-                -fx-font-size: 11px;
-                -fx-padding: 2 6 2 6;
-                -fx-background-radius: 4;
-                -fx-border-radius: 4;
-                -fx-effect: none;
-            """);
+                content.getChildren().addAll(title, details, tagsLabel);
 
-                VBox extraInfoBox = new VBox();
-                extraInfoBox.setSpacing(4);
-                extraInfoBox.setPadding(new Insets(8, 0, 0, 0));
-                extraInfoBox.setVisible(false);
+                ScrollPane scrollPane = new ScrollPane(content);
+                scrollPane.setFitToWidth(true);
+                scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+                scrollPane.setStyle("-fx-background-color: transparent;");
 
-                TextFlow cat = createBoldTextLine("Category: ", artifact.optString("category", "N/A"));
-                TextFlow civ = createBoldTextLine("Civilization: ", artifact.optString("civilization", "N/A"));
-                TextFlow comp = createBoldTextLine("Composition: ", artifact.optString("composition", "Unknown"));
-                TextFlow date = createBoldTextLine("Discovery Date: ", artifact.optString("discoverydate", "Unknown"));
-                TextFlow place = createBoldTextLine("Current Place: ", artifact.optString("currentplace", "Unknown"));
+                card.getChildren().add(scrollPane);
 
-
-                extraInfoBox.getChildren().addAll(cat, civ, comp, date, place);
-
-                detailButton.setOnAction(e -> {
-                    extraInfoBox.setVisible(!extraInfoBox.isVisible());
-                });
-
-                VBox infoBox = new VBox(name, location, tagsLabel, detailButton, extraInfoBox);
-                infoBox.setSpacing(4);
-                infoBox.setPadding(new Insets(10));
-
-                card.getChildren().addAll(imageView, infoBox);
                 artifactContainer.getChildren().add(card);
             }
         });
     }
-
-    private TextFlow createBoldTextLine(String label, String value) {
-        Text labelBold = new Text(label);
-        labelBold.setStyle("-fx-font-weight: bold; -fx-fill: #263238;");
-
-        Text labelValue = new Text(value);
-        labelValue.setStyle("-fx-fill: #455A64;");
-
-        return new TextFlow(labelBold, labelValue);
-    }
-
 
     @FXML
     private void handleFilterByTag() {
