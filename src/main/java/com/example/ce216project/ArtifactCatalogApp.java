@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -102,6 +103,10 @@ public class ArtifactCatalogApp extends Application {
     }
 
     private void showExamples() {
+        Stage dialog = new Stage();
+        dialog.setTitle("Add Artifact");
+        dialog.initModality(Modality.APPLICATION_MODAL);
+
         Stage exampleStage = new Stage();
         exampleStage.setTitle("Example Uses of the Application");
 
@@ -128,69 +133,53 @@ public class ArtifactCatalogApp extends Application {
     private void showAccessibilityOptions() {
         displayArea.setText("Accessibility: Modify settings for better usability.");
     }
-    private void showAddArtifactDialog() {
+    public void showAddArtifactDialog() {
         Stage dialog = new Stage();
-        dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Add Artifact");
+        dialog.initModality(Modality.APPLICATION_MODAL);
 
-        // **Zorunlu Alan (ID)**
-        TextField idField = new TextField();
-        idField.setPromptText("Artifact ID * (Required)");
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
 
-        // **İsteğe Bağlı Alanlar**
-        TextField nameField = new TextField();
-        nameField.setPromptText("Artifact Name");
+        VBox form = new VBox(15);
+        form.setPadding(new Insets(25));
+        form.setAlignment(Pos.CENTER);
+        form.setStyle("""
+            -fx-background-color: #F5F5F5;
+        """);
 
-        TextField categoryField = new TextField();
-        categoryField.setPromptText("Category");
+        String textFieldStyle = "-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;";
 
-        TextField civilizationField = new TextField();
-        civilizationField.setPromptText("Civilization");
+        TextField idField = new TextField(); idField.setPromptText("Artifact ID * (Required)"); idField.setStyle(textFieldStyle);
+        TextField nameField = new TextField(); nameField.setPromptText("Artifact Name"); nameField.setStyle(textFieldStyle);
+        TextField categoryField = new TextField(); categoryField.setPromptText("Category"); categoryField.setStyle(textFieldStyle);
+        TextField civilizationField = new TextField(); civilizationField.setPromptText("Civilization"); civilizationField.setStyle(textFieldStyle);
+        TextField discoveryLocationField = new TextField(); discoveryLocationField.setPromptText("Discovery Location"); discoveryLocationField.setStyle(textFieldStyle);
+        TextField compositionField = new TextField(); compositionField.setPromptText("Composition"); compositionField.setStyle(textFieldStyle);
+        TextField discoveryDateField = new TextField(); discoveryDateField.setPromptText("Discovery Date"); discoveryDateField.setStyle(textFieldStyle);
+        TextField currentPlaceField = new TextField(); currentPlaceField.setPromptText("Current Place"); currentPlaceField.setStyle(textFieldStyle);
+        TextField widthField = new TextField(); widthField.setPromptText("Width (cm)"); widthField.setStyle(textFieldStyle);
+        TextField lengthField = new TextField(); lengthField.setPromptText("Length (cm)"); lengthField.setStyle(textFieldStyle);
+        TextField heightField = new TextField(); heightField.setPromptText("Height (cm)"); heightField.setStyle(textFieldStyle);
+        TextField weightField = new TextField(); weightField.setPromptText("Weight (kg)"); weightField.setStyle(textFieldStyle);
+        TextField tagsField = new TextField(); tagsField.setPromptText("Tags (comma separated)"); tagsField.setStyle(textFieldStyle);
 
-        TextField discoveryLocationField = new TextField();
-        discoveryLocationField.setPromptText("Discovery Location");
+        Button addButton = new Button("➕ Add Artifact");
+        addButton.setMaxWidth(Double.MAX_VALUE);
+        addButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;");
 
-        TextField compositionField = new TextField();
-        compositionField.setPromptText("Composition");
-
-        TextField discoveryDateField = new TextField();
-        discoveryDateField.setPromptText("Discovery Date");
-
-        TextField currentPlaceField = new TextField();
-        currentPlaceField.setPromptText("Current Place");
-
-        TextField widthField = new TextField();
-        widthField.setPromptText("Width (cm)");
-
-        TextField lengthField = new TextField();
-        lengthField.setPromptText("Length (cm)");
-
-        TextField heightField = new TextField();
-        heightField.setPromptText("Height (cm)");
-
-        TextField weightField = new TextField();
-        weightField.setPromptText("Weight (kg)");
-
-        TextField tagsField = new TextField();
-        tagsField.setPromptText("Tags (comma separated)");
-
-
-        Button addButton = new Button("Add Artifact");
         addButton.setOnAction(e -> {
             String artifactId = idField.getText().trim();
-
 
             if (artifactId.isEmpty()) {
                 showAlert("Error", "Artifact ID is required!");
                 return;
             }
 
-
             if (isArtifactIdExists(artifactId)) {
                 showAlert("Error", "An artifact with this ID already exists!");
                 return;
             }
-
 
             JSONObject newArtifact = new JSONObject();
             newArtifact.put("artifactid", artifactId);
@@ -202,16 +191,13 @@ public class ArtifactCatalogApp extends Application {
             newArtifact.put("discoverydate", discoveryDateField.getText().trim().isEmpty() ? "Unknown" : discoveryDateField.getText().trim());
             newArtifact.put("currentplace", currentPlaceField.getText().trim().isEmpty() ? "Unknown" : currentPlaceField.getText().trim());
 
-
             JSONObject dimensions = new JSONObject();
             dimensions.put("width", widthField.getText().trim().isEmpty() ? 0 : Integer.parseInt(widthField.getText().trim()));
             dimensions.put("length", lengthField.getText().trim().isEmpty() ? 0 : Integer.parseInt(lengthField.getText().trim()));
             dimensions.put("height", heightField.getText().trim().isEmpty() ? 0 : Integer.parseInt(heightField.getText().trim()));
             newArtifact.put("dimensions", dimensions);
 
-
             newArtifact.put("weight", weightField.getText().trim().isEmpty() ? 0 : Integer.parseInt(weightField.getText().trim()));
-
 
             JSONArray tagsArray = new JSONArray();
             String tagsInput = tagsField.getText().trim();
@@ -223,19 +209,19 @@ public class ArtifactCatalogApp extends Application {
             }
             newArtifact.put("tags", tagsArray);
 
-
             artifacts.put(newArtifact);
             displayArtifacts(artifacts);
             dialog.close();
         });
 
+        form.getChildren().addAll(
+                idField, nameField, categoryField, civilizationField, discoveryLocationField,
+                compositionField, discoveryDateField, currentPlaceField,
+                widthField, lengthField, heightField, weightField, tagsField, addButton
+        );
 
-        VBox layout = new VBox(10, idField, nameField, categoryField, civilizationField, discoveryLocationField,
-                compositionField, discoveryDateField, currentPlaceField, widthField, lengthField, heightField,
-                weightField, tagsField, addButton);
-        layout.setPadding(new Insets(10));
-
-        Scene scene = new Scene(layout, 400, 500);
+        scrollPane.setContent(form);
+        Scene scene = new Scene(scrollPane, 400, 500);
         dialog.setScene(scene);
         dialog.show();
     }
@@ -249,7 +235,7 @@ public class ArtifactCatalogApp extends Application {
         return false;
     }
 
-    private void showEditArtifactDialog() {
+    public void showEditArtifactDialog() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Edit Artifact");
         dialog.setHeaderText("Enter the Artifact ID to Edit:");
@@ -287,7 +273,7 @@ public class ArtifactCatalogApp extends Application {
         });
     }
 
-    private void showDeleteArtifactDialog() {
+    public void showDeleteArtifactDialog() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Delete Artifact");
         dialog.setHeaderText("Enter the Artifact ID to Delete:");
@@ -324,7 +310,7 @@ public class ArtifactCatalogApp extends Application {
         return null;
     }
 
-    private void showAlert(String title, String content) {
+    public void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -352,7 +338,7 @@ public class ArtifactCatalogApp extends Application {
         }
         displayArtifacts(filteredArtifacts);
     }
-    private ArtifactCatalogController controller; // Controller referansı
+    private ArtifactCatalogController controller;
 
     // Controller'ı ayarlamak için metod
     public void setController(ArtifactCatalogController controller) {
@@ -362,14 +348,14 @@ public class ArtifactCatalogApp extends Application {
     // Display Artifacts güncellendi
     public void displayArtifacts(JSONArray artifacts) {
         if (controller != null) {
-            controller.displayArtifacts(artifacts); // Controller üzerinden çağır
+            controller.displayArtifacts(artifacts);
         } else {
             System.out.println("Controller bağlantısı yok!");
         }
     }
 
 
-    private void exportJsonFile(Stage stage) {
+    public void exportJsonFile(Stage stage) {
         if (artifacts.isEmpty()) {
             displayArea.setText("No data to export.");
             return;
@@ -390,13 +376,12 @@ public class ArtifactCatalogApp extends Application {
         }
         artifactListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // Alan seçim listesi
         String[] possibleFields = {"artifactid", "artifactname", "category", "civilization", "discoverylocation", "composition", "discoverydate", "currentplace", "dimensions", "weight", "tags"};
         ListView<String> fieldListView = new ListView<>();
         fieldListView.getItems().addAll(possibleFields);
         fieldListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // 'Select All' butonu
+
         Button selectAllButton = new Button("Select All");
         selectAllButton.setOnAction(e -> fieldListView.getSelectionModel().selectAll());
 
@@ -422,7 +407,7 @@ public class ArtifactCatalogApp extends Application {
         selectionStage.show();
     }
 
-    private void saveJsonWithSelectedArtifactsAndFields(Stage stage, ObservableList<String> selectedArtifacts, ObservableList<String> selectedFields) {
+    public void saveJsonWithSelectedArtifactsAndFields(Stage stage, ObservableList<String> selectedArtifacts, ObservableList<String> selectedFields) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Export JSON File");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
@@ -535,7 +520,7 @@ public class ArtifactCatalogApp extends Application {
                     artifacts.put(newArtifacts.getJSONObject(i));
                 }
 
-                // ✅ JSON dosyası yüklendikten sonra ekrana yazdır
+
                 displayArtifacts(artifacts);
 
             } catch (Exception e) {
@@ -558,10 +543,8 @@ public class ArtifactCatalogApp extends Application {
             }
         }
 
-        // Terminale güncellenen etiketleri yazdırarak kontrol edelim
         System.out.println("Updated Available Tags: " + uniqueTags);
 
-        // **JavaFX UI Güncelleme**
         Platform.runLater(() -> {
             tagListView.getItems().clear();
             if (uniqueTags.isEmpty()) {
@@ -572,7 +555,6 @@ public class ArtifactCatalogApp extends Application {
             }
         });
     }
-
 
     public static void main(String[] args) {
         launch(args);

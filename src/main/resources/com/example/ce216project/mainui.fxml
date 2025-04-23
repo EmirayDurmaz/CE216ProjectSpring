@@ -4,44 +4,53 @@
 <?import javafx.scene.control.*?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
-<AnchorPane fx:controller="com.example.ce216project.ArtifactCatalogController"
+
+<BorderPane fx:controller="com.example.ce216project.ArtifactCatalogController"
             xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1">
+
    <stylesheets>
       <URL value="@style.css"/>
    </stylesheets>
-   <HBox spacing="0" prefWidth="900" prefHeight="600">
 
-      <VBox fx:id="sidebar" spacing="20" alignment="CENTER">
+   <!-- Sol Menü -->
+   <left>
+      <VBox fx:id="sidebar" spacing="20" alignment="CENTER" style="-fx-background-color: #6C63FF;">
+         <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+         </padding>
          <Button fx:id="btnAdd" text="➕ Add Artifact" onAction="#handleAdd"/>
          <Button fx:id="btnEdit" text="✏ Edit Artifact" onAction="#handleEdit"/>
          <Button fx:id="btnDelete" text="🗑 Delete Artifact" onAction="#handleDelete"/>
          <Button fx:id="btnSearch" text="🔍 Search" onAction="#handleSearch"/>
-         <Button fx:id="btnListArtifacts" text="📜 List Artifacts" onAction="#handleListArtifacts"/>
+         <Button fx:id="btnListArtifacts" text="🏷 Filter by Tag" onAction="#handleFilterByTag"/>
          <Button fx:id="btnImport" text="📂 Import JSON" onAction="#handleImport"/>
          <Button fx:id="btnExport" text="📤 Export JSON" onAction="#handleExport"/>
          <Button fx:id="btnHelp" text="❓ Help" onAction="#handleHelp"/>
-
-
-
-
-
+         <Button fx:id="btnBackToAll" text="← Back to All Artifacts" onAction="#handleBackToAll" visible="false"/>
       </VBox>
-      <VBox spacing="10">
-         <ListView fx:id="artifactListView" prefWidth="600" prefHeight="400"/>
+   </left>
 
-         <ScrollPane fitToWidth="true">
-            <content>
-               <VBox fx:id="artifactContainer" spacing="10">
-                  <padding>
-                     <Insets top="10" right="10" bottom="10" left="10"/>
-                  </padding>
-               </VBox>
-            </content>
-         </ScrollPane>
-      </VBox>
-      <TextArea fx:id="displayArea" prefWidth="600" prefHeight="400"/>
+   <!-- Üst Etiket Alanı -->
+   <top>
+      <HBox fx:id="tagBar" spacing="10" style="-fx-background-color: #ECEFF1;">
+         <padding>
+            <Insets top="10" left="20" bottom="10" right="20"/>
+         </padding>
+      </HBox>
+   </top>
 
-      <AnchorPane fx:id="contentArea" style="-fx-background-color: #ECF0F1;" prefWidth="700"/>
-   </HBox>
-</AnchorPane>
+   <!-- Kart Alanı -->
+   <center>
+      <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
+         <content>
+            <TilePane fx:id="artifactContainer" hgap="20" vgap="20" style="-fx-background-color: transparent;">
+               <padding>
+                  <Insets top="20" right="20" bottom="20" left="20"/>
+               </padding>
+            </TilePane>
+         </content>
+      </ScrollPane>
+   </center>
+
+</BorderPane>
