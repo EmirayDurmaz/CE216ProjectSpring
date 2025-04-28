@@ -51,7 +51,7 @@ public class ArtifactCatalogController {
         if (app != null) {
             app.showAddArtifactDialog();
         } else {
-            showMessage("Uygulama bağlantısı yok.");
+            showMessage("There is no app connection.");
         }
     }
 
@@ -60,7 +60,7 @@ public class ArtifactCatalogController {
         if (app != null) {
             app.showEditArtifactDialog();
         } else {
-            showMessage("Uygulama bağlantısı yok.");
+            showMessage("There is no app connection.");
         }
     }
 
@@ -69,7 +69,7 @@ public class ArtifactCatalogController {
         if (app != null) {
             app.showDeleteArtifactDialog();
         } else {
-            showMessage("Uygulama bağlantısı yok.");
+            showMessage("There is no app connection.");
         }
     }
 
@@ -104,7 +104,7 @@ public class ArtifactCatalogController {
     @FXML
     private void handleImport() {
         if (app == null) {
-            showMessage("Uygulama bağlantısı yok.");
+            showMessage("There is no app connection.");
             return;
         }
 
@@ -133,26 +133,26 @@ public class ArtifactCatalogController {
                 app.displayArtifacts(allArtifacts);
 
             } catch (Exception e) {
-                showMessage("Hata: JSON yuklenemedi.\n" + e.getMessage());
+                showMessage("Error: JSON could not be loaded.\n" + e.getMessage());
                 e.printStackTrace();
             }
         } else {
-            showMessage("Dosya secilmedi.");
+            showMessage("No file selected.");
         }
     }
 
     @FXML
     private void handleBackToAll() {
-        app.displayArtifacts(app.getArtifacts()); // Tüm artifactleri geri yükle
-        btnBackToAll.setVisible(false); // Geri butonunu gizle
+        app.displayArtifacts(app.getArtifacts());
+        btnBackToAll.setVisible(false);
     }
     @FXML
     private void handleExport() {
         if (app != null) {
-            Stage stage = (Stage) btnImport.getScene().getWindow(); // btnImport sahnesinden stage al
-            app.exportJsonFile(stage); // ✅ Export penceresini çağır
+            Stage stage = (Stage) btnImport.getScene().getWindow();
+            app.exportJsonFile(stage);
         } else {
-            showMessage("there is no app connection!.");
+            showMessage("There is no app connection!.");
         }
     }
 
@@ -279,7 +279,6 @@ public class ArtifactCatalogController {
 
         return new TextFlow(labelBold, labelValue);
     }
-
 
     @FXML
     private void handleFilterByTag() {

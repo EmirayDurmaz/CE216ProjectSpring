@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -39,10 +38,9 @@ public class ArtifactCatalogApp extends Application {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/ce216project/mainui.fxml"));
             Parent root = loader.load();
 
-            // ✅ Controller'ı al ve ArtifactCatalogApp nesnesini ilet
             ArtifactCatalogController controller = loader.getController();
-            controller.setApp(this); // Controller'a app nesnesini ilet
-            setController(controller); // Controller bağlantısını kaydet
+            controller.setApp(this);
+            setController(controller);
 
             Scene scene = new Scene(root, 900, 600);
             primaryStage.setScene(scene);
@@ -229,7 +227,7 @@ public class ArtifactCatalogApp extends Application {
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
             if (artifact.optString("artifactid").equalsIgnoreCase(artifactId)) {
-                return true; // Aynı ID zaten var
+                return true;
             }
         }
         return false;
@@ -340,17 +338,15 @@ public class ArtifactCatalogApp extends Application {
     }
     private ArtifactCatalogController controller;
 
-    // Controller'ı ayarlamak için metod
     public void setController(ArtifactCatalogController controller) {
         this.controller = controller;
     }
 
-    // Display Artifacts güncellendi
     public void displayArtifacts(JSONArray artifacts) {
         if (controller != null) {
             controller.displayArtifacts(artifacts);
         } else {
-            System.out.println("Controller bağlantısı yok!");
+            System.out.println("No controller connection!");
         }
     }
 
@@ -361,12 +357,10 @@ public class ArtifactCatalogApp extends Application {
             return;
         }
 
-        // Seçim penceresi oluştur
         Stage selectionStage = new Stage();
         selectionStage.initModality(Modality.APPLICATION_MODAL);
         selectionStage.setTitle("Select Artifacts and Fields to Export");
 
-        // Artifact seçim listesi
         ListView<String> artifactListView = new ListView<>();
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
@@ -437,8 +431,8 @@ public class ArtifactCatalogApp extends Application {
             } catch (IOException e) {
                 displayArea.setText("Error exporting file: " + e.getMessage());
             }
-}
-}
+        }
+    }
 
     public JSONArray getArtifacts() {
         return artifacts;
@@ -450,7 +444,6 @@ public class ArtifactCatalogApp extends Application {
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
 
-            // JSON içindeki tüm alanlarda arama yap
             if (artifact.toString().toLowerCase().contains(lowerCaseQuery)) {
                 filteredArtifacts.put(artifact);
             }
@@ -469,7 +462,6 @@ public class ArtifactCatalogApp extends Application {
             if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {
                 JSONArray tagsArray = artifact.getJSONArray("tags");
 
-                // Küçük harf formatında karşılaştırma yap
                 Set<String> artifactTags = new HashSet<>();
                 for (int j = 0; j < tagsArray.length(); j++) {
                     artifactTags.add(tagsArray.getString(j).toLowerCase());
@@ -478,7 +470,7 @@ public class ArtifactCatalogApp extends Application {
                 for (String selectedTag : selectedTags) {
                     if (artifactTags.contains(selectedTag.toLowerCase())) {
                         filteredArtifacts.put(artifact);
-                        break; // Artifact zaten filtrelendi, tekrar eklemeye gerek yok
+                        break;
                     }
                 }
             }
@@ -532,7 +524,6 @@ public class ArtifactCatalogApp extends Application {
     private void updateTagListView() {
         Set<String> uniqueTags = new HashSet<>();
 
-        // JSON'daki tüm `tags` alanlarını topla
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
             if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {

@@ -9,48 +9,48 @@
             xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1">
 
-   <stylesheets>
-      <URL value="@style.css"/>
-   </stylesheets>
+    <stylesheets>
+        <URL value="@style.css"/>
+    </stylesheets>
 
-   <!-- Sol Menü -->
-   <left>
-      <VBox fx:id="sidebar" spacing="20" alignment="CENTER" style="-fx-background-color: #6C63FF;">
-         <padding>
-            <Insets top="20" right="20" bottom="20" left="20"/>
-         </padding>
-         <Button fx:id="btnAdd" text="➕ Add Artifact" onAction="#handleAdd"/>
-         <Button fx:id="btnEdit" text="✏ Edit Artifact" onAction="#handleEdit"/>
-         <Button fx:id="btnDelete" text="🗑 Delete Artifact" onAction="#handleDelete"/>
-         <Button fx:id="btnSearch" text="🔍 Search" onAction="#handleSearch"/>
-         <Button fx:id="btnListArtifacts" text="🏷 Filter by Tag" onAction="#handleFilterByTag"/>
-         <Button fx:id="btnImport" text="📂 Import JSON" onAction="#handleImport"/>
-         <Button fx:id="btnExport" text="📤 Export JSON" onAction="#handleExport"/>
-         <Button fx:id="btnHelp" text="❓ Help" onAction="#handleHelp"/>
-         <Button fx:id="btnBackToAll" text="← Back to All Artifacts" onAction="#handleBackToAll" visible="false"/>
-      </VBox>
-   </left>
+    <!-- Sol Menü -->
+    <left>
+        <VBox fx:id="sidebar" spacing="20" alignment="CENTER" style="-fx-background-color: #6C63FF;">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Button fx:id="btnAdd" text="➕ Add Artifact" onAction="#handleAdd"/>
+            <Button fx:id="btnEdit" text="✏ Edit Artifact" onAction="#handleEdit"/>
+            <Button fx:id="btnDelete" text="🗑 Delete Artifact" onAction="#handleDelete"/>
+            <Button fx:id="btnSearch" text="🔍 Search" onAction="#handleSearch"/>
+            <Button fx:id="btnListArtifacts" text="🏷 Filter by Tag" onAction="#handleFilterByTag"/>
+            <Button fx:id="btnImport" text="📂 Import JSON" onAction="#handleImport"/>
+            <Button fx:id="btnExport" text="📤 Export JSON" onAction="#handleExport"/>
+            <Button fx:id="btnHelp" text="❓ Help" onAction="#handleHelp"/>
+            <Button fx:id="btnBackToAll" text="← Back to All Artifacts" onAction="#handleBackToAll" visible="false"/>
+        </VBox>
+    </left>
 
-   <!-- Üst Etiket Alanı -->
-   <top>
-      <HBox fx:id="tagBar" spacing="10" style="-fx-background-color: #ECEFF1;">
-         <padding>
-            <Insets top="10" left="20" bottom="10" right="20"/>
-         </padding>
-      </HBox>
-   </top>
+    <!-- Üst Etiket Alanı -->
+    <top>
+        <HBox fx:id="tagBar" spacing="10" style="-fx-background-color: #ECEFF1;">
+            <padding>
+                <Insets top="10" left="20" bottom="10" right="20"/>
+            </padding>
+        </HBox>
+    </top>
 
-   <!-- Kart Alanı -->
-   <center>
-      <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
-         <content>
-            <TilePane fx:id="artifactContainer" hgap="20" vgap="20" style="-fx-background-color: transparent;">
-               <padding>
-                  <Insets top="20" right="20" bottom="20" left="20"/>
-               </padding>
-            </TilePane>
-         </content>
-      </ScrollPane>
-   </center>
+    <!-- Kart Alanı -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
+            <content>
+                <TilePane fx:id="artifactContainer" hgap="20" vgap="20" style="-fx-background-color: transparent;">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                </TilePane>
+            </content>
+        </ScrollPane>
+    </center>
 
 </BorderPane>
