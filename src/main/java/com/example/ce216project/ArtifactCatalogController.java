@@ -219,6 +219,17 @@ public class ArtifactCatalogController {
                 Label location = new Label("📍 " + artifact.optString("discoverylocation", "Unknown"));
                 location.setStyle("-fx-font-size: 13px; -fx-text-fill: #455A64;");
 
+                Label idLabel = new Label("ID: " + artifact.optString("artifactid", "N/A"));
+                idLabel.setStyle("""
+                  -fx-font-size: 10px;
+                  -fx-background-color: #ECEFF1;
+                  -fx-text-fill: #37474F;
+                  -fx-padding: 2 6 2 6;
+                  -fx-background-radius: 6;
+                  -fx-alignment: center-right;
+                   """);
+
+
                 StringBuilder tagsText = new StringBuilder("🏷 Tags: ");
                 if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {
                     JSONArray tags = artifact.getJSONArray("tags");
@@ -228,7 +239,11 @@ public class ArtifactCatalogController {
                     }
                 }
                 Label tagsLabel = new Label(tagsText.toString());
-                tagsLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #607D8B;");
+                tagsLabel.setStyle("""
+                 -fx-font-size: 13px;
+                -fx-font-weight: bold;
+                -fx-text-fill: #37474F;
+                """);
                 tagsLabel.setWrapText(true);
 
                 Button detailButton = new Button("Details");
@@ -260,7 +275,7 @@ public class ArtifactCatalogController {
                     extraInfoBox.setVisible(!extraInfoBox.isVisible());
                 });
 
-                VBox infoBox = new VBox(name, location, tagsLabel, detailButton, extraInfoBox);
+                VBox infoBox = new VBox(name,idLabel,location, tagsLabel,detailButton, extraInfoBox);
                 infoBox.setSpacing(4);
                 infoBox.setPadding(new Insets(10));
 
@@ -321,8 +336,30 @@ public class ArtifactCatalogController {
         TextField tagField = new TextField();
         tagField.setPromptText("e.g. Ancient, War, Pottery");
 
+        tagField.setStyle("""
+         -fx-background-radius: 10;
+         -fx-border-radius: 10;
+         -fx-border-color: #90CAF9;
+         -fx-border-width: 1;
+         -fx-padding: 6 10 6 10;
+         """);
+
         Button okButton = new Button("OK");
+        okButton.setStyle("""
+    -fx-background-color: #6C63FF;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 4 12 4 12;
+""");
         Button cancelButton = new Button("Cancel");
+
+        cancelButton.setStyle("""
+    -fx-background-color: #E0E0E0;
+    -fx-text-fill: #333;
+    -fx-background-radius: 8;
+    -fx-padding: 4 12 4 12;
+""");
 
         HBox buttonBox = new HBox(10, okButton, cancelButton);
         buttonBox.setPadding(new Insets(10));
@@ -331,12 +368,14 @@ public class ArtifactCatalogController {
         VBox layout = new VBox(15, instruction, tagField, buttonBox);
         layout.setPadding(new Insets(20));
         layout.setStyle("""
-        -fx-background-color: white;
-        -fx-background-radius: 12;
-        -fx-border-color: #B0BEC5;
-        -fx-border-radius: 12;
-        -fx-border-width: 1;
-    """);
+    -fx-background-color: linear-gradient(to bottom, #FAFAFA, #E3F2FD);
+    -fx-background-radius: 12;
+    -fx-border-color: #90CAF9;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+""");
+
+
 
         Scene scene = new Scene(layout, 320, 180);
         dialog.setScene(scene);

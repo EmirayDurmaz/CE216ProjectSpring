@@ -161,7 +161,23 @@ public class ArtifactCatalogApp extends Application {
         TextField heightField = new TextField(); heightField.setPromptText("Height (cm)"); heightField.setStyle(textFieldStyle);
         TextField weightField = new TextField(); weightField.setPromptText("Weight (kg)"); weightField.setStyle(textFieldStyle);
         TextField tagsField = new TextField(); tagsField.setPromptText("Tags (comma separated)"); tagsField.setStyle(textFieldStyle);
+        TextField imagePathField = new TextField();
+        imagePathField.setPromptText("Image Path");
+        imagePathField.setStyle(textFieldStyle);
+        imagePathField.setEditable(false);
 
+        Button browseImageButton = new Button("Select Image");
+        browseImageButton.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose Image File");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+            );
+            File selectedFile = fileChooser.showOpenDialog(dialog);
+            if (selectedFile != null) {
+                imagePathField.setText(selectedFile.toURI().toString());
+            }
+        });
         Button addButton = new Button("➕ Add Artifact");
         addButton.setMaxWidth(Double.MAX_VALUE);
         addButton.setStyle("-fx-background-color: #6C63FF; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;");
@@ -188,6 +204,7 @@ public class ArtifactCatalogApp extends Application {
             newArtifact.put("composition", compositionField.getText().trim().isEmpty() ? "Unknown" : compositionField.getText().trim());
             newArtifact.put("discoverydate", discoveryDateField.getText().trim().isEmpty() ? "Unknown" : discoveryDateField.getText().trim());
             newArtifact.put("currentplace", currentPlaceField.getText().trim().isEmpty() ? "Unknown" : currentPlaceField.getText().trim());
+            newArtifact.put("image", imagePathField.getText().trim());
 
             JSONObject dimensions = new JSONObject();
             dimensions.put("width", widthField.getText().trim().isEmpty() ? 0 : Integer.parseInt(widthField.getText().trim()));
@@ -215,7 +232,7 @@ public class ArtifactCatalogApp extends Application {
         form.getChildren().addAll(
                 idField, nameField, categoryField, civilizationField, discoveryLocationField,
                 compositionField, discoveryDateField, currentPlaceField,
-                widthField, lengthField, heightField, weightField, tagsField, addButton
+                widthField, lengthField, heightField, weightField, tagsField,imagePathField, browseImageButton,addButton
         );
 
         scrollPane.setContent(form);

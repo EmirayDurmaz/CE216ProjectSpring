@@ -28,5 +28,5 @@ public class AddArtifactView {
         Scene scene = new Scene(layout, 300, 200);
         window.setScene(scene);
         window.showAndWait();
-    }
+}
 }
