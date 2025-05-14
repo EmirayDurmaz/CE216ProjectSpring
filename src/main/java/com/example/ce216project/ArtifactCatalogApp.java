@@ -308,7 +308,7 @@ public class ArtifactCatalogApp extends Application {
         dialog.setScene(scene);
         dialog.show();
     }
-    
+
     private boolean isArtifactIdExists(String artifactId) {
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
@@ -332,23 +332,64 @@ public class ArtifactCatalogApp extends Application {
                 editStage.initModality(Modality.APPLICATION_MODAL);
                 editStage.setTitle("Edit Artifact");
 
+                Label nameLabel = new Label("Artifact Name:");
                 TextField nameField = new TextField(artifact.optString("artifactname", ""));
-                TextField categoryField = new TextField(artifact.optString("category", ""));
+
+                Label categoryLabel = new Label("Category:");
+                ComboBox<String> categoryComboBox = new ComboBox<>();
+                categoryComboBox.getItems().addAll("Sculpture", "Manuscript", "Weapon", "Tool", "Jewelry", "Other");
+                categoryComboBox.setEditable(false);
+
+              
+                String currentCategory = artifact.optString("category", "");
+                TextField customCategoryField = new TextField();
+                customCategoryField.setPromptText("Enter custom category");
+                customCategoryField.setVisible(false);
+
+                if (categoryComboBox.getItems().contains(currentCategory)) {
+                    categoryComboBox.setValue(currentCategory);
+                } else {
+                    categoryComboBox.setValue("Other");
+                    customCategoryField.setText(currentCategory);
+                    customCategoryField.setVisible(true);
+                }
+
+
+                categoryComboBox.setOnAction(e -> {
+                    String selected = categoryComboBox.getValue();
+                    customCategoryField.setVisible("Other".equals(selected));
+                });
+
+                Label civilizationLabel = new Label("Civilization:");
                 TextField civilizationField = new TextField(artifact.optString("civilization", ""));
 
                 Button saveButton = new Button("Save");
                 saveButton.setOnAction(e -> {
                     artifact.put("artifactname", nameField.getText());
-                    artifact.put("category", categoryField.getText());
+
+                    String selectedCategory = categoryComboBox.getValue();
+                    if ("Other".equals(selectedCategory)) {
+                        artifact.put("category", customCategoryField.getText().trim());
+                    } else {
+                        artifact.put("category", selectedCategory);
+                    }
+
                     artifact.put("civilization", civilizationField.getText());
 
                     displayArtifacts(artifacts);
                     editStage.close();
                 });
 
-                VBox layout = new VBox(10, nameField, categoryField, civilizationField, saveButton);
+                VBox layout = new VBox(10,
+                        nameLabel, nameField,
+                        categoryLabel, categoryComboBox,
+                        customCategoryField,
+                        new Label("Civilization:"), civilizationField,
+                        saveButton
+                );
                 layout.setPadding(new Insets(10));
-                Scene scene = new Scene(layout, 300, 250);
+
+                Scene scene = new Scene(layout, 320, 330);
                 editStage.setScene(scene);
                 editStage.show();
             } else {
@@ -356,6 +397,7 @@ public class ArtifactCatalogApp extends Application {
             }
         });
     }
+
 
     public void showDeleteArtifactDialog() {
         TextInputDialog dialog = new TextInputDialog();
