@@ -8,7 +8,7 @@
 - [Contributors](#contributors)
 
 
-## Features
+1. ## Features
 - 🏺 Create, edit, and delete artifact records
 - 🔍 Advanced search and filtering by tags/categories
 - 📁 JSON import/export functionality
@@ -16,7 +16,7 @@
 - 📚 Comprehensive help manual
 - 🏷️ Tag-based artifact organization
 
-
+## Usage
 2.1 **Using the Installer**:
    - Download the `ArtifactCatalogSetup.exe` from releases
    - Run the installer and follow the instructions
@@ -38,7 +38,7 @@
 
 -Lastly if you feel lost or you need help, you can fild detailed information at our help center.
 
-3. **Contributors**
+3. ## Contributors
 - Yasemin Güler koçar
 - Meltem Demir
 - Emiray Durmaz
