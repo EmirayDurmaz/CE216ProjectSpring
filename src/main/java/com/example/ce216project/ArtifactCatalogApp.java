@@ -436,9 +436,11 @@ public class ArtifactCatalogApp extends Application {
         fieldListView.getItems().addAll(possibleFields);
         fieldListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        Button selectAllFieldsButton = new Button("Select All Fields");
+        selectAllFieldsButton.setOnAction(e -> fieldListView.getSelectionModel().selectAll());
 
-        Button selectAllButton = new Button("Select All");
-        selectAllButton.setOnAction(e -> fieldListView.getSelectionModel().selectAll());
+        Button selectAllArtifactsButton = new Button("Select All Artifacts");
+        selectAllArtifactsButton.setOnAction(e -> artifactListView.getSelectionModel().selectAll());
 
         Button exportButton = new Button("Export Selected");
         exportButton.setOnAction(e -> {
@@ -453,11 +455,18 @@ public class ArtifactCatalogApp extends Application {
             saveJsonWithSelectedArtifactsAndFields(stage, selectedArtifacts, selectedFields);
         });
 
-        VBox layout = new VBox(10, new Label("Select artifacts to export:"), artifactListView,
-                new Label("Select fields to export:"), fieldListView, selectAllButton, exportButton);
+        VBox layout = new VBox(10,
+                new Label("Select artifacts to export:"),
+                artifactListView,
+                selectAllArtifactsButton,
+                new Label("Select fields to export:"),
+                fieldListView,
+                selectAllFieldsButton,
+                exportButton
+        );
         layout.setPadding(new Insets(10));
 
-        Scene scene = new Scene(layout, 400, 500);
+        Scene scene = new Scene(layout, 400, 550);
         selectionStage.setScene(scene);
         selectionStage.show();
     }
