@@ -371,31 +371,33 @@ public class ArtifactCatalogController {
         ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
+        VBox checkBoxContainer = new VBox(8);
+        checkBoxContainer.setPadding(new Insets(10));
 
-        ListView<String> tagListView = new ListView<>();
-        tagListView.getItems().addAll(allTags);
+        List<CheckBox> checkBoxes = new ArrayList<>();
+        for (String tag : allTags) {
+            CheckBox checkBox = new CheckBox(tag);
+            checkBoxes.add(checkBox);
+            checkBoxContainer.getChildren().add(checkBox);
+        }
 
+        ScrollPane scrollPane = new ScrollPane(checkBoxContainer);
+        scrollPane.setPrefSize(250, 300);
+        scrollPane.setFitToWidth(true);
 
-        tagListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        tagListView.setPrefSize(200, 250);
-
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(20));
-        content.getChildren().addAll(new Label("Select tags to filter artifacts:"), tagListView);
-
+        VBox content = new VBox(10, new Label("Select tags to filter artifacts:"), scrollPane);
+        content.setPadding(new Insets(15));
         dialog.getDialogPane().setContent(content);
-
-        Node okButton = dialog.getDialogPane().lookupButton(okButtonType);
-        okButton.setDisable(true);
-
-        tagListView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<String>) change -> {
-            okButton.setDisable(tagListView.getSelectionModel().getSelectedItems().isEmpty());
-        });
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == okButtonType) {
-                return tagListView.getSelectionModel().getSelectedItems();
+                ObservableList<String> selectedTags = FXCollections.observableArrayList();
+                for (CheckBox cb : checkBoxes) {
+                    if (cb.isSelected()) {
+                        selectedTags.add(cb.getText());
+                    }
+                }
+                return selectedTags;
             }
             return null;
         });
@@ -408,6 +410,19 @@ public class ArtifactCatalogController {
                 btnBackToAll.setVisible(true);
             }
         });
+        btnBackToAll.setVisible(true);
+        btnBackToAll.setText("🔙 Show All Artifacts");
+        btnBackToAll.setStyle("""
+    -fx-background-color: #ECEFF1;
+    -fx-text-fill: #263238;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #B0BEC5;
+    -fx-border-radius: 8;
+""");
+        btnBackToAll.setVisible(true);
+
+
     }
 
     private void filterArtifactsByTags(ObservableList<String> selectedTags) {

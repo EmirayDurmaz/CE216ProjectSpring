@@ -42,7 +42,7 @@ public class ArtifactCatalogApp extends Application {
             controller.setApp(this);
             setController(controller);
 
-            Scene scene = new Scene(root, 900, 600);
+            Scene scene = new Scene(root, 1200, 800);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Artifact Catalog");
             primaryStage.show();
@@ -340,7 +340,7 @@ public class ArtifactCatalogApp extends Application {
                 categoryComboBox.getItems().addAll("Sculpture", "Manuscript", "Weapon", "Tool", "Jewelry", "Other");
                 categoryComboBox.setEditable(false);
 
-              
+
                 String currentCategory = artifact.optString("category", "");
                 TextField customCategoryField = new TextField();
                 customCategoryField.setPromptText("Enter custom category");
