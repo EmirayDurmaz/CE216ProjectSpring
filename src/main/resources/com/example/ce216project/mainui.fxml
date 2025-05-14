@@ -37,6 +37,8 @@
             <padding>
                 <Insets top="10" left="20" bottom="10" right="20"/>
             </padding>
+            <!-- Tag filtreleme ComboBox'u buraya eklendi -->
+            <ComboBox fx:id="tagFilterComboBox" promptText="Select a tag to filter" prefWidth="180"/>
         </HBox>
     </top>
 

@@ -47,8 +47,9 @@ public class ArtifactCatalogApp extends Application {
             primaryStage.setTitle("Artifact Catalog");
             primaryStage.show();
 
-
             loadDefaultArtifacts();
+
+            controller.updateTagList();
 
         } catch (Exception e) {
             e.printStackTrace();
