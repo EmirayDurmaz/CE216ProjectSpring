@@ -46,12 +46,41 @@ public class ArtifactCatalogApp extends Application {
             primaryStage.setScene(scene);
             primaryStage.setTitle("Artifact Catalog");
             primaryStage.show();
+
+
+            loadDefaultArtifacts();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private void loadDefaultArtifacts() {
+        String[] defaultFiles = {
+                "src/main/resources/artifacts1.json",
+                "src/main/resources/artifacts2.json",
+                "src/main/resources/artifacts3.json"
+        };
 
+        try {
+            for (String path : defaultFiles) {
+                File file = new File(path);
+                if (file.exists()) {
+                    String content = new String(Files.readAllBytes(file.toPath()));
+                    JSONArray fileArtifacts = new JSONArray(content);
+                    for (int i = 0; i < fileArtifacts.length(); i++) {
+                        artifacts.put(fileArtifacts.getJSONObject(i));
+                    }
+                } else {
+                    System.out.println("File not found: " + path);
+                }
+            }
+
+            displayArtifacts(artifacts);
+        } catch (Exception e) {
+            System.out.println("Error loading default artifacts: " + e.getMessage());
+        }
+    }
 
     void showBasicHelp() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -154,7 +183,17 @@ public class ArtifactCatalogApp extends Application {
         TextField civilizationField = new TextField(); civilizationField.setPromptText("Civilization"); civilizationField.setStyle(textFieldStyle);
         TextField discoveryLocationField = new TextField(); discoveryLocationField.setPromptText("Discovery Location"); discoveryLocationField.setStyle(textFieldStyle);
         TextField compositionField = new TextField(); compositionField.setPromptText("Composition"); compositionField.setStyle(textFieldStyle);
-        TextField discoveryDateField = new TextField(); discoveryDateField.setPromptText("Discovery Date"); discoveryDateField.setStyle(textFieldStyle);
+        DatePicker discoveryDatePicker = new DatePicker();
+        discoveryDatePicker.setPromptText("Discovery Date");
+        discoveryDatePicker.setStyle("""
+         -fx-background-radius: 10;
+        -fx-border-radius: 10;
+        -fx-padding: 8;
+        -fx-font-size: 12px;
+        -fx-pref-height: 30px;
+        """);
+
+
         TextField currentPlaceField = new TextField(); currentPlaceField.setPromptText("Current Place"); currentPlaceField.setStyle(textFieldStyle);
         TextField widthField = new TextField(); widthField.setPromptText("Width (cm)"); widthField.setStyle(textFieldStyle);
         TextField lengthField = new TextField(); lengthField.setPromptText("Length (cm)"); lengthField.setStyle(textFieldStyle);
@@ -202,7 +241,9 @@ public class ArtifactCatalogApp extends Application {
             newArtifact.put("civilization", civilizationField.getText().trim().isEmpty() ? "Unknown" : civilizationField.getText().trim());
             newArtifact.put("discoverylocation", discoveryLocationField.getText().trim().isEmpty() ? "Unknown" : discoveryLocationField.getText().trim());
             newArtifact.put("composition", compositionField.getText().trim().isEmpty() ? "Unknown" : compositionField.getText().trim());
-            newArtifact.put("discoverydate", discoveryDateField.getText().trim().isEmpty() ? "Unknown" : discoveryDateField.getText().trim());
+            newArtifact.put("discoverydate",
+                    discoveryDatePicker.getValue() != null ? discoveryDatePicker.getValue().toString() : "Unknown");
+
             newArtifact.put("currentplace", currentPlaceField.getText().trim().isEmpty() ? "Unknown" : currentPlaceField.getText().trim());
             newArtifact.put("image", imagePathField.getText().trim());
 
@@ -231,9 +272,11 @@ public class ArtifactCatalogApp extends Application {
 
         form.getChildren().addAll(
                 idField, nameField, categoryField, civilizationField, discoveryLocationField,
-                compositionField, discoveryDateField, currentPlaceField,
-                widthField, lengthField, heightField, weightField, tagsField,imagePathField, browseImageButton,addButton
+                compositionField, discoveryDatePicker, currentPlaceField,
+                widthField, lengthField, heightField, weightField, tagsField,
+                imagePathField, browseImageButton, addButton
         );
+
 
         scrollPane.setContent(form);
         Scene scene = new Scene(scrollPane, 400, 500);
@@ -503,7 +546,7 @@ public class ArtifactCatalogApp extends Application {
             return;
         }
 
-        try (FileWriter file = new FileWriter("artifacts.json")) {
+        try (FileWriter file = new FileWriter("artifacts1.json")) {
             file.write(artifacts.toString(4));
             displayArea.appendText("\nImported artifacts saved successfully!");
         } catch (IOException e) {

@@ -1,0 +1,16 @@
+[
+    {
+        "artifactname": "Rosetta Stone",
+        "civilization": "Ancient Egyptian",
+        "composition": "Granodiorite",
+        "discoverylocation": "Rosetta, Egypt",
+        "weight": 760,
+        "category": "Manuscript",
+        "tags": [
+            "ancient",
+            "hieroglyphs",
+            "historical"
+        ],
+        "image": "file:/C:/Users/emira/OneDrive/Masaüstü/item1.jpg"
+    }
+]
