@@ -310,7 +310,6 @@ public class ArtifactCatalogController {
         });
     }
 
-
     @FXML
     private void handleImport() {
         if (app == null) {
@@ -318,37 +317,8 @@ public class ArtifactCatalogController {
             return;
         }
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Import JSON File");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("JSON Files", "*.json"));
-
         Stage stage = (Stage) btnImport.getScene().getWindow();
-        File file = fileChooser.showOpenDialog(stage);
-
-        if (file != null) {
-            try {
-                String content = new String(java.nio.file.Files.readAllBytes(file.toPath()));
-                Object json = new org.json.JSONTokener(content).nextValue();
-
-                JSONArray newArtifacts = (json instanceof JSONObject)
-                        ? new JSONArray().put((JSONObject) json)
-                        : (JSONArray) json;
-
-                JSONArray allArtifacts = app.getArtifacts();
-                for (int i = 0; i < newArtifacts.length(); i++) {
-                    allArtifacts.put(newArtifacts.getJSONObject(i));
-                }
-
-                app.displayArtifacts(allArtifacts);
-
-            } catch (Exception e) {
-                showMessage("Error: JSON could not be loaded.\n" + e.getMessage());
-                e.printStackTrace();
-            }
-        } else {
-            showMessage("No file selected.");
-        }
+        app.importJsonFile(stage);
     }
 
     /*@FXML
@@ -382,167 +352,14 @@ public class ArtifactCatalogController {
         }
     }
 
-    /*private void showMessage(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Info");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 
-     */
-    /*public void displayArtifacts(JSONArray artifacts) {
-        Platform.runLater(() -> {
-            artifactContainer.getChildren().clear();
-
-            for (int i = 0; i < artifacts.length(); i++) {
-                JSONObject artifact = artifacts.getJSONObject(i);
-
-                VBox card = new VBox();
-                card.setPrefWidth(260);
-                card.setStyle("""
-                -fx-background-color: white;
-                -fx-background-radius: 12;
-                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0.3, 0, 2);
-            """);
-
-                String imagePath = artifact.optString("image", "file:images/artifact_default.jpg");
-                if (!imagePath.startsWith("file:") && !imagePath.startsWith("http")) {
-                    imagePath = "file:" + imagePath;
-                }
-
-                ImageView imageView = new ImageView();
-                try {
-                    imageView.setImage(new Image(imagePath));
-                } catch (Exception e) {
-                    imageView.setImage(new Image("file:images/artifact_default.jpg"));
-                }
-
-                imageView.setFitWidth(260);
-                imageView.setFitHeight(180);
-                imageView.setPreserveRatio(true);
-                imageView.setSmooth(true);
-                imageView.setCache(true);
-
-                imageView.setStyle("-fx-alignment: center;");
-
-                Label name = new Label("🏺 " + artifact.optString("artifactname", "N/A"));
-                name.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #263238;");
-
-                Label location = new Label("📍 " + artifact.optString("discoverylocation", "Unknown"));
-                location.setStyle("-fx-font-size: 13px; -fx-text-fill: #455A64;");
-
-                Label idLabel = new Label("ID: " + artifact.optString("artifactid", "N/A"));
-                idLabel.setStyle("""
-                  -fx-font-size: 10px;
-                  -fx-background-color: #ECEFF1;
-                  -fx-text-fill: #37474F;
-                  -fx-padding: 2 6 2 6;
-                  -fx-background-radius: 6;
-                  -fx-alignment: center-right;
-                   """);
-
-
-                StringBuilder tagsText = new StringBuilder("🏷 Tags: ");
-                if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {
-                    JSONArray tags = artifact.getJSONArray("tags");
-                    for (int j = 0; j < tags.length(); j++) {
-                        tagsText.append(tags.getString(j));
-                        if (j != tags.length() - 1) tagsText.append(", ");
-                    }
-                }
-                Label tagsLabel = new Label(tagsText.toString());
-                tagsLabel.setStyle("""
-                 -fx-font-size: 13px;
-                -fx-font-weight: bold;
-                -fx-text-fill: #37474F;
-                """);
-                tagsLabel.setWrapText(true);
-
-                Button detailButton = new Button("Details");
-                detailButton.setStyle("""
-                -fx-background-color: #6C63FF;
-                -fx-text-fill: white;
-                -fx-font-size: 11px;
-                -fx-padding: 2 6 2 6;
-                -fx-background-radius: 4;
-                -fx-border-radius: 4;
-                -fx-effect: none;
-            """);
-
-                VBox extraInfoBox = new VBox();
-                extraInfoBox.setSpacing(4);
-                extraInfoBox.setPadding(new Insets(8, 0, 0, 0));
-                extraInfoBox.setVisible(false);
-
-                TextFlow cat = createBoldTextLine("Category: ", artifact.optString("category", "N/A"));
-                TextFlow civ = createBoldTextLine("Civilization: ", artifact.optString("civilization", "N/A"));
-                TextFlow comp = createBoldTextLine("Composition: ", artifact.optString("composition", "Unknown"));
-                TextFlow date = createBoldTextLine("Discovery Date: ", artifact.optString("discoverydate", "Unknown"));
-                TextFlow place = createBoldTextLine("Current Place: ", artifact.optString("currentplace", "Unknown"));
-
-
-                extraInfoBox.getChildren().addAll(cat, civ, comp, date, place);
-
-                detailButton.setOnAction(e -> {
-                    extraInfoBox.setVisible(!extraInfoBox.isVisible());
-                });
-
-                VBox infoBox = new VBox(name,idLabel,location, tagsLabel,detailButton, extraInfoBox);
-                infoBox.setSpacing(4);
-                infoBox.setPadding(new Insets(10));
-
-                card.getChildren().addAll(imageView, infoBox);
-                artifactContainer.getChildren().add(card);
-            }
-        });
-    }
-
-     */
-
-    /*private TextFlow createBoldTextLine(String label, String value) {
-        Text labelBold = new Text(label);
-        labelBold.setStyle("-fx-font-weight: bold; -fx-fill: #263238;");
-
-        Text labelValue = new Text(value);
-        labelValue.setStyle("-fx-fill: #455A64;");
-
-        return new TextFlow(labelBold, labelValue);
-    }
-
-     */
 
     @FXML
     private void handleFilterByTag() {
         showTagFilterDialog();
     }
 
-    /*private void filterArtifactsByTag(String targetTag) {
-        JSONArray filtered = new JSONArray();
-        JSONArray allArtifacts = app.getArtifacts();
 
-        for (int i = 0; i < allArtifacts.length(); i++) {
-            JSONObject artifact = allArtifacts.getJSONObject(i);
-            if (artifact.has("tags")) {
-                JSONArray tags = artifact.getJSONArray("tags");
-                for (int j = 0; j < tags.length(); j++) {
-                    String tag = tags.getString(j).toLowerCase();
-                    if (tag.equals(targetTag)) {
-                        filtered.put(artifact);
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (filtered.isEmpty()) {
-            showMessage("No artifacts found with tag: " + targetTag);
-        }
-
-        app.displayArtifacts(filtered);
-    }
-
-     */
 
     private void showTagFilterDialog() {
         if (app == null) return;
@@ -554,11 +371,11 @@ public class ArtifactCatalogController {
         ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okButtonType, ButtonType.CANCEL);
 
-        // Burada ListView oluşturuluyor
+
         ListView<String> tagListView = new ListView<>();
         tagListView.getItems().addAll(allTags);
 
-        // **İşte buraya ekle çoklu seçim modu**
+
         tagListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         tagListView.setPrefSize(200, 250);

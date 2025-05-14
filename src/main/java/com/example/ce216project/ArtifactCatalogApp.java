@@ -56,6 +56,9 @@ public class ArtifactCatalogApp extends Application {
         }
     }
 
+    private Set<String> existingIds = new HashSet<>();
+
+
     private void loadDefaultArtifacts() {
         String[] defaultFiles = {
                 "src/main/resources/artifacts1.json",
@@ -70,18 +73,34 @@ public class ArtifactCatalogApp extends Application {
                     String content = new String(Files.readAllBytes(file.toPath()));
                     JSONArray fileArtifacts = new JSONArray(content);
                     for (int i = 0; i < fileArtifacts.length(); i++) {
-                        artifacts.put(fileArtifacts.getJSONObject(i));
+                        JSONObject artifact = fileArtifacts.getJSONObject(i);
+                        String id = artifact.optString("artifactid", "").trim();
+                        if (id.isEmpty()) {
+                            id = generateUniqueArtifactId();
+                            artifact.put("artifactid", id);
+                        }
+                        if (!existingIds.contains(id)) {
+                            artifacts.put(artifact);
+                            existingIds.add(id);
+                        }
                     }
-                } else {
-                    System.out.println("File not found: " + path);
                 }
             }
-
             displayArtifacts(artifacts);
         } catch (Exception e) {
             System.out.println("Error loading default artifacts: " + e.getMessage());
         }
     }
+
+    private int nextArtifactId = 1000;
+    private String generateUniqueArtifactId() {
+        while (existingIds.contains(String.valueOf(nextArtifactId))) {
+            nextArtifactId++;
+        }
+        return String.valueOf(nextArtifactId++);
+    }
+
+
 
     void showBasicHelp() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -178,7 +197,12 @@ public class ArtifactCatalogApp extends Application {
 
         String textFieldStyle = "-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;";
 
-        TextField idField = new TextField(); idField.setPromptText("Artifact ID * (Required)"); idField.setStyle(textFieldStyle);
+        TextField idField = new TextField();
+        idField.setPromptText("Artifact ID (Auto Generated)");
+        idField.setStyle(textFieldStyle);
+        idField.setEditable(false);
+        idField.setText(generateUniqueArtifactId());
+
         TextField nameField = new TextField(); nameField.setPromptText("Artifact Name"); nameField.setStyle(textFieldStyle);
         TextField categoryField = new TextField(); categoryField.setPromptText("Category"); categoryField.setStyle(textFieldStyle);
         TextField civilizationField = new TextField(); civilizationField.setPromptText("Civilization"); civilizationField.setStyle(textFieldStyle);
@@ -211,7 +235,7 @@ public class ArtifactCatalogApp extends Application {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose Image File");
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                    new FileChooser.ExtensionFilter("Image Files", ".png", ".jpg", ".jpeg", ".gif")
             );
             File selectedFile = fileChooser.showOpenDialog(dialog);
             if (selectedFile != null) {
@@ -284,6 +308,7 @@ public class ArtifactCatalogApp extends Application {
         dialog.setScene(scene);
         dialog.show();
     }
+    
     private boolean isArtifactIdExists(String artifactId) {
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
@@ -576,20 +601,39 @@ public class ArtifactCatalogApp extends Application {
                 Object json = new org.json.JSONTokener(content).nextValue();
                 JSONArray newArtifacts = json instanceof JSONObject ? new JSONArray().put((JSONObject) json) : (JSONArray) json;
 
-                System.out.println("Imported JSON Data: " + newArtifacts.toString(4));
+                int addedCount = 0;
+                int skippedCount = 0;
 
                 for (int i = 0; i < newArtifacts.length(); i++) {
-                    artifacts.put(newArtifacts.getJSONObject(i));
+                    JSONObject artifact = newArtifacts.getJSONObject(i);
+
+
+                    if (!artifact.has("artifactid") || artifact.getString("artifactid").isBlank()) {
+                        artifact.put("artifactid", generateUniqueArtifactId());
+                    }
+
+                    String incomingId = artifact.getString("artifactid");
+                    if (isArtifactIdExists(incomingId)) {
+                        skippedCount++;
+                        continue;
+                    }
+
+                    artifacts.put(artifact);
+                    addedCount++;
                 }
 
+                if (skippedCount > 0) {
+                    showAlert("Duplicate Skipped", skippedCount + " artifact(s) with duplicate ID were skipped.");
+                }
 
                 displayArtifacts(artifacts);
 
             } catch (Exception e) {
-                System.out.println("Error loading artifacts: " + e.getMessage());
+                showAlert("Import Error", "Failed to import JSON: " + e.getMessage());
             }
         }
     }
+
 
     private void updateTagListView() {
         Set<String> uniqueTags = new HashSet<>();
