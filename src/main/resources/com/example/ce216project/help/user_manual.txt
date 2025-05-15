@@ -1,0 +1,56 @@
+User Manual – Historical Artifact Catalog System
+
+Overview:
+This application is designed to help you collect, manage, and export data related to historical artifacts. Each artifact includes metadata such as name, id, width, date and tags.
+
+Step-by-Step Usage:
+
+1. Starting the App
+   - Double-click the application icon on your desktop.
+   - Main dashboard will load showing existing artifacts.
+
+2. Importing Artifacts
+   - Click "Import JSON File".
+   - Select a `.json` file containing one or more artifacts.
+   - Artifacts will be parsed and loaded.
+
+3. Adding an Artifact
+   - Press "➕ Add Artifact".
+   - Fill in the fields: name, category, civilization, discovery info, dimensions, weight, tags.
+   - Image path is optional but recommended.
+   - Click 'Add' to save it to the in-memory list.
+
+4. Editing an Artifact
+   - Press "✏ Edit Artifact".
+   - Enter the `artifactid` to fetch the existing artifact.
+   - Modify values like name, civilization, or category.
+   - Save the changes.
+
+5. Deleting an Artifact
+   - Press "🗑 Delete Artifact".
+   - Enter the `artifactid` to delete the artifact from memory.
+
+6. Filtering by Tags
+   - Click "Filter by Tag".
+   - Select one or more tags to only display relevant artifacts.
+   - Use "🔙 Show All Artifacts" to reset the view.
+
+7. Searching
+   - Press "Search".
+   - Enter a keyword to find artifacts matching that term in any field.
+
+8. Exporting Artifacts
+   - Press "Export JSON File".
+   - Select which artifacts and which fields you want to include.
+   - Save the resulting `.json` file.
+
+9. Viewing Details
+   - On each card, press the "Details" button.
+   - Extended information like dimensions, composition, place, and weight will appear.
+
+10. Help Menu
+    - Use "Help > Help Center" from the menu to access Basic Help, FAQ, and this Manual.
+
+Notes:
+- All data is stored in memory until explicitly exported or saved.
+- Ensure paths are valid for consistent display.

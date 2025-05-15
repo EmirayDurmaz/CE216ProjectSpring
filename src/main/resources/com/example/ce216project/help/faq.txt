@@ -1,0 +1,31 @@
+Frequently Asked Questions (FAQ):
+
+Q1: Can I add an image for each artifact?
+A1: Yes. While adding an artifact, click 'Select Image' and choose the file. It will be saved as a path.
+
+Q2: What format should my files be in when importing?
+A2: The application supports JSON format only. You can import a JSON array or a single object.
+
+Q3: What happens if I add an artifact with an existing ID?
+A3: The system will automatically skip duplicates and generate a warning.
+
+Q4: Can I edit an artifact's category to something custom?
+A4: Yes. Choose "Other" from the dropdown, and type your custom category.
+
+Q5: How do I filter multiple tags?
+A5: Use the 'Filter by Tag' button and select multiple tags from the dialog.
+
+Q6: Why are some images not showing?
+A6: If the image path is invalid or the file was moved/deleted, a default placeholder will be shown.
+
+Q7: What fields are required when adding a new artifact?
+A7: The system allows partial entries. However, `artifactid` is always required and automatically generated if left blank.
+
+Q8: Can I undo a delete?
+A8: No. Deletions are permanent unless you re-import the artifact manually via JSON.
+
+Q9: Where is the data saved?
+A9: All artifact data is saved in-memory until exported or saved manually as JSON.
+
+Q10: Does this software work on Mac or Linux?
+A10: The main target is Windows. Compatibility with other OS is not guaranteed.

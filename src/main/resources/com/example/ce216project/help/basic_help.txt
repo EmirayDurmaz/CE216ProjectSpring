@@ -1,0 +1,11 @@
+How to Use the Software:
+
+1. Click 'Import JSON File' to load artifact data into the system.
+2. Use the search bar to quickly locate artifacts by any keyword.
+3. Press 'Add Artifact' to create a new entry.
+4. Click 'Edit Artifact' to update existing entries.
+5. Press 'Export JSON File' to save selected artifacts.
+6. Use 'Filter by Tag' to narrow down your artifact list.
+7. Use 'Delete Artifact' if you want to remove an item by its ID.
+8. View details by pressing the 'Details' button on each card.
+9. For help or user manual, use the 'Help' section.

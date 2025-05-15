@@ -21,8 +21,10 @@ import org.json.JSONObject;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ArtifactCatalogApp extends Application {
     private TextArea displayArea;
@@ -1058,6 +1060,96 @@ public class ArtifactCatalogApp extends Application {
             }
         });
     }
+
+    public void showHelpCenter() {
+        Stage helpStage = new Stage();
+        helpStage.setTitle("📖 Help Center");
+        helpStage.initModality(Modality.APPLICATION_MODAL);
+
+        TabPane tabPane = new TabPane();
+        tabPane.setTabMinWidth(130);
+        tabPane.setTabMaxHeight(40);
+        tabPane.setStyle("-fx-background-color: #F5F5F5;");
+
+        Tab basicTab = new Tab("📌 Basic Help");
+        Tab faqTab = new Tab("❓ FAQ");
+        Tab manualTab = new Tab("📘 User Manual");
+
+        basicTab.setClosable(false);
+        faqTab.setClosable(false);
+        manualTab.setClosable(false);
+
+        TextArea basicArea = createStyledTextArea(loadHelpContent("/com/example/ce216project/help/basic_help.txt"));
+        TextArea faqArea = createStyledTextArea(loadHelpContent("/com/example/ce216project/help/faq.txt"));
+        TextArea manualArea = createStyledTextArea(loadHelpContent("/com/example/ce216project/help/user_manual.txt"));
+
+        ScrollPane basicScroll = new ScrollPane(basicArea);
+        ScrollPane faqScroll = new ScrollPane(faqArea);
+        ScrollPane manualScroll = new ScrollPane(manualArea);
+
+        basicScroll.setFitToWidth(true);
+        faqScroll.setFitToWidth(true);
+        manualScroll.setFitToWidth(true);
+
+        basicTab.setContent(basicScroll);
+        faqTab.setContent(faqScroll);
+        manualTab.setContent(manualScroll);
+
+        tabPane.getTabs().addAll(basicTab, faqTab, manualTab);
+
+        Button closeButton = new Button("✖ Close");
+        closeButton.setStyle("""
+        -fx-background-color: #6C63FF;
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-background-radius: 12;
+        -fx-font-size: 13px;
+        -fx-padding: 8 16 8 16;
+    """);
+        closeButton.setOnAction(e -> helpStage.close());
+
+        VBox layout = new VBox(20, tabPane, closeButton);
+        layout.setStyle("-fx-background-color: #FAFAFA;");
+        layout.setPadding(new Insets(20));
+        layout.setAlignment(Pos.CENTER);
+
+        VBox.setVgrow(tabPane, Priority.ALWAYS); // TabPane tüm alanı kaplasın
+        VBox.setVgrow(closeButton, Priority.NEVER);
+
+        Scene scene = new Scene(layout, 700, 550); // Daha geniş bir pencere
+        helpStage.setScene(scene);
+        helpStage.show();
+    }
+
+    private TextArea createStyledTextArea(String content) {
+        TextArea area = new TextArea(content);
+        area.setEditable(false);
+        area.setWrapText(true);
+        area.setStyle("""
+        -fx-background-color: white;
+        -fx-border-color: #CFD8DC;
+        -fx-border-radius: 8;
+        -fx-background-radius: 8;
+        -fx-padding: 10;
+        -fx-font-family: 'Segoe UI';
+        -fx-font-size: 13px;
+        -fx-text-fill: #37474F;
+    """);
+        area.setPrefHeight(400); // Yüksekliği ayarla
+        return area;
+    }
+
+
+    private String loadHelpContent(String resourcePath) {
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(resourcePath))))) {
+            return reader.lines().collect(Collectors.joining("\n"));
+        } catch (Exception e) {
+            return "Error loading content: " + e.getMessage();
+        }
+    }
+
+
 
     public static void main(String[] args) {
         launch(args);

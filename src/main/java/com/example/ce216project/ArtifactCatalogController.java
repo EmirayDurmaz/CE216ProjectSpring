@@ -373,8 +373,9 @@ public class ArtifactCatalogController {
     @FXML
     private void handleHelp() {
         if (app != null) {
-            app.showBasicHelp();
+            app.showHelpCenter();
         }
+
     }
 
     @FXML
@@ -494,6 +495,7 @@ public class ArtifactCatalogController {
 
         app.displayArtifacts(filteredArtifacts);
     }
+
 
 
 }
