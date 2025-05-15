@@ -95,6 +95,17 @@ public class ArtifactCatalogController {
         System.out.println("Loaded tags: " + allTags);
     }
 
+    public void updateTagsFromSet(Set<String> tagsSet) {
+
+        Platform.runLater(() -> {
+            allTags.clear();
+            List<String> sortedTags = new ArrayList<>(tagsSet);
+            Collections.sort(sortedTags);
+            allTags.addAll(sortedTags);
+
+        });
+    }
+
 
     private void filterArtifactsByTag(String targetTag) {
         if (app == null) return;

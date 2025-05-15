@@ -448,11 +448,30 @@ public class ArtifactCatalogApp extends Application {
         return false;
     }
 
+    private void updateAllTags() {
+        Set<String> tagsSet = new HashSet<>();
+
+        for (int i = 0; i < artifacts.length(); i++) {
+            JSONObject artifact = artifacts.getJSONObject(i);
+            if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {
+                JSONArray tags = artifact.getJSONArray("tags");
+                for (int j = 0; j < tags.length(); j++) {
+                    tagsSet.add(tags.getString(j).toLowerCase());
+                }
+            }
+        }
+
+        if (controller != null) {
+            controller.updateTagsFromSet(tagsSet);
+        }
+    }
+
+
     public void showEditArtifactDialog() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Edit Artifact");
-        dialog.setHeaderText("Enter the Artifact ID to Edit:");
-        Optional<String> result = dialog.showAndWait();
+        TextInputDialog idDialog = new TextInputDialog();
+        idDialog.setTitle("Edit Artifact");
+        idDialog.setHeaderText("Enter the Artifact ID to Edit:");
+        Optional<String> result = idDialog.showAndWait();
 
         result.ifPresent(artifactId -> {
             JSONObject artifact = findArtifactById(artifactId);
@@ -461,19 +480,35 @@ public class ArtifactCatalogApp extends Application {
                 editStage.initModality(Modality.APPLICATION_MODAL);
                 editStage.setTitle("Edit Artifact");
 
-                Label nameLabel = new Label("Artifact Name:");
-                TextField nameField = new TextField(artifact.optString("artifactname", ""));
+                ScrollPane scrollPane = new ScrollPane();
+                scrollPane.setFitToWidth(true);
 
-                Label categoryLabel = new Label("Category:");
+                VBox form = new VBox(10);
+                form.setPadding(new Insets(25));
+                form.setAlignment(Pos.TOP_LEFT);
+                form.setStyle("-fx-background-color: #F5F5F5;");
+
+                String textFieldStyle = "-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;";
+
+                Label idLabel = new Label("Artifact ID");
+                TextField idField = new TextField(artifact.optString("artifactid", ""));
+                idField.setEditable(false);
+                idField.setStyle(textFieldStyle);
+
+                Label nameLabel = new Label("Artifact Name");
+                TextField nameField = new TextField(artifact.optString("artifactname", ""));
+                nameField.setStyle(textFieldStyle);
+
+                Label categoryLabel = new Label("Category");
                 ComboBox<String> categoryComboBox = new ComboBox<>();
                 categoryComboBox.getItems().addAll("Sculpture", "Manuscript", "Weapon", "Tool", "Jewelry", "Other");
                 categoryComboBox.setEditable(false);
-
 
                 String currentCategory = artifact.optString("category", "");
                 TextField customCategoryField = new TextField();
                 customCategoryField.setPromptText("Enter custom category");
                 customCategoryField.setVisible(false);
+                customCategoryField.setStyle(textFieldStyle);
 
                 if (categoryComboBox.getItems().contains(currentCategory)) {
                     categoryComboBox.setValue(currentCategory);
@@ -483,49 +518,214 @@ public class ArtifactCatalogApp extends Application {
                     customCategoryField.setVisible(true);
                 }
 
-
                 categoryComboBox.setOnAction(e -> {
                     String selected = categoryComboBox.getValue();
                     customCategoryField.setVisible("Other".equals(selected));
                 });
 
-                Label civilizationLabel = new Label("Civilization:");
+                Label civilizationLabel = new Label("Civilization");
                 TextField civilizationField = new TextField(artifact.optString("civilization", ""));
+                civilizationField.setStyle(textFieldStyle);
+
+                Label discoveryLocationLabel = new Label("Discovery Location");
+                TextField discoveryLocationField = new TextField(artifact.optString("discoverylocation", ""));
+                discoveryLocationField.setStyle(textFieldStyle);
+
+                Label compositionLabel = new Label("Composition");
+                TextField compositionField = new TextField(artifact.optString("composition", ""));
+                compositionField.setStyle(textFieldStyle);
+
+                Label discoveryDateLabel = new Label("Discovery Date");
+                DatePicker discoveryDatePicker = new DatePicker();
+                if (!artifact.optString("discoverydate", "").isEmpty() && !artifact.optString("discoverydate", "Unknown").equals("Unknown")) {
+                    try {
+                        discoveryDatePicker.setValue(java.time.LocalDate.parse(artifact.optString("discoverydate")));
+                    } catch (Exception ignored) {
+                    }
+                }
+                discoveryDatePicker.setStyle("-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8; -fx-font-size: 12px; -fx-pref-height: 30px;");
+
+                Label currentPlaceLabel = new Label("Current Place");
+                TextField currentPlaceField = new TextField(artifact.optString("currentplace", ""));
+                currentPlaceField.setStyle(textFieldStyle);
+
+                Label widthLabel = new Label("Width (cm)");
+                TextField widthField = new TextField();
+                widthField.setText(String.valueOf(artifact.optJSONObject("dimensions") != null ? artifact.optJSONObject("dimensions").optDouble("width", 0.0) : 0.0));
+                widthField.setStyle(textFieldStyle);
+
+                Label lengthLabel = new Label("Length (cm)");
+                TextField lengthField = new TextField();
+                lengthField.setText(String.valueOf(artifact.optJSONObject("dimensions") != null ? artifact.optJSONObject("dimensions").optDouble("length", 0.0) : 0.0));
+                lengthField.setStyle(textFieldStyle);
+
+                Label heightLabel = new Label("Height (cm)");
+                TextField heightField = new TextField();
+                heightField.setText(String.valueOf(artifact.optJSONObject("dimensions") != null ? artifact.optJSONObject("dimensions").optDouble("height", 0.0) : 0.0));
+                heightField.setStyle(textFieldStyle);
+
+                Label weightLabel = new Label("Weight (kg)");
+                TextField weightField = new TextField(String.valueOf(artifact.optDouble("weight", 0.0)));
+                weightField.setStyle(textFieldStyle);
+
+                Label tagsLabel = new Label("Tags");
+                FlowPane tagsPane = new FlowPane();
+                tagsPane.setHgap(5);
+                tagsPane.setVgap(5);
+                tagsPane.setPrefWrapLength(300);
+
+                Set<String> currentTags = new HashSet<>();
+                if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {
+                    JSONArray tagsArray = artifact.getJSONArray("tags");
+                    for (int i = 0; i < tagsArray.length(); i++) {
+                        String tag = tagsArray.getString(i);
+                        currentTags.add(tag);
+                        Label tagLabel = createTagLabel(tag, currentTags, tagsPane);
+                        tagsPane.getChildren().add(tagLabel);
+                    }
+                }
+
+                TextField newTagField = new TextField();
+                newTagField.setPromptText("Add tag and press Enter");
+                newTagField.setStyle(textFieldStyle);
+
+                newTagField.setOnAction(e -> {
+                    String newTag = newTagField.getText().trim().toLowerCase();
+
+                    if (newTag.isEmpty()) {
+                        return;
+                    }
+
+                    if (currentTags.contains(newTag)) {
+                        showAlert("Duplicate Tag", "This tag already exists!");
+                        newTagField.clear();
+                        return;
+                    }
+
+                    currentTags.add(newTag);
+                    Label tagLabel = createTagLabel(newTag, currentTags, tagsPane);
+                    tagsPane.getChildren().add(tagLabel);
+
+                    newTagField.clear();
+                });
+
+                Label imagePathLabel = new Label("Image Path");
+                TextField imagePathField = new TextField(artifact.optString("image", ""));
+                imagePathField.setEditable(false);
+                imagePathField.setStyle(textFieldStyle);
+
+                Button browseImageButton = new Button("Select Image");
+                browseImageButton.setOnAction(event -> {
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.setTitle("Choose Image File");
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                    );
+                    File selectedFile = fileChooser.showOpenDialog(editStage);
+                    if (selectedFile != null) {
+                        imagePathField.setText(selectedFile.toURI().toString());
+                    }
+                });
 
                 Button saveButton = new Button("Save");
+                saveButton.setMaxWidth(Double.MAX_VALUE);
+                saveButton.setPrefHeight(40);
+                saveButton.setStyle("""
+                -fx-background-color: #6C63FF;
+                -fx-text-fill: white;
+                -fx-font-weight: bold;
+                -fx-background-radius: 10;
+                -fx-font-size: 14px;
+                -fx-padding: 8 16 8 16;
+            """);
+
                 saveButton.setOnAction(e -> {
-                    artifact.put("artifactname", nameField.getText());
+
+                    if (!widthField.getText().trim().isEmpty() && !isNumeric(widthField.getText().trim())) {
+                        showAlert("Input Error", "Width must be a valid number.");
+                        return;
+                    }
+                    if (!lengthField.getText().trim().isEmpty() && !isNumeric(lengthField.getText().trim())) {
+                        showAlert("Input Error", "Length must be a valid number.");
+                        return;
+                    }
+                    if (!heightField.getText().trim().isEmpty() && !isNumeric(heightField.getText().trim())) {
+                        showAlert("Input Error", "Height must be a valid number.");
+                        return;
+                    }
+                    if (!weightField.getText().trim().isEmpty() && !isNumeric(weightField.getText().trim())) {
+                        showAlert("Input Error", "Weight must be a valid number.");
+                        return;
+                    }
+
+
+                    artifact.put("artifactname", nameField.getText().trim().isEmpty() ? "Unknown" : nameField.getText().trim());
 
                     String selectedCategory = categoryComboBox.getValue();
                     if ("Other".equals(selectedCategory)) {
-                        artifact.put("category", customCategoryField.getText().trim());
+                        artifact.put("category", customCategoryField.getText().trim().isEmpty() ? "Unknown" : customCategoryField.getText().trim());
                     } else {
                         artifact.put("category", selectedCategory);
                     }
 
-                    artifact.put("civilization", civilizationField.getText());
+                    artifact.put("civilization", civilizationField.getText().trim().isEmpty() ? "Unknown" : civilizationField.getText().trim());
+                    artifact.put("discoverylocation", discoveryLocationField.getText().trim().isEmpty() ? "Unknown" : discoveryLocationField.getText().trim());
+                    artifact.put("composition", compositionField.getText().trim().isEmpty() ? "Unknown" : compositionField.getText().trim());
+                    artifact.put("discoverydate", discoveryDatePicker.getValue() != null ? discoveryDatePicker.getValue().toString() : "Unknown");
+                    artifact.put("currentplace", currentPlaceField.getText().trim().isEmpty() ? "Unknown" : currentPlaceField.getText().trim());
+
+                    JSONObject dimensions = new JSONObject();
+                    dimensions.put("width", widthField.getText().trim().isEmpty() ? 0.0 : Double.parseDouble(widthField.getText().trim()));
+                    dimensions.put("length", lengthField.getText().trim().isEmpty() ? 0.0 : Double.parseDouble(lengthField.getText().trim()));
+                    dimensions.put("height", heightField.getText().trim().isEmpty() ? 0.0 : Double.parseDouble(heightField.getText().trim()));
+                    artifact.put("dimensions", dimensions);
+
+                    artifact.put("weight", weightField.getText().trim().isEmpty() ? 0.0 : Double.parseDouble(weightField.getText().trim()));
+
+                    JSONArray tagsArray = new JSONArray();
+                    for (String tag : currentTags) {
+                        tagsArray.put(tag);
+                    }
+                    artifact.put("tags", tagsArray);
+
+                    artifact.put("image", imagePathField.getText().trim());
+
+                    updateAllTags();
 
                     displayArtifacts(artifacts);
                     editStage.close();
                 });
 
-                VBox layout = new VBox(10,
+                form.getChildren().addAll(
+                        idLabel, idField,
                         nameLabel, nameField,
-                        categoryLabel, categoryComboBox,
-                        customCategoryField,
-                        new Label("Civilization:"), civilizationField,
+                        categoryLabel, categoryComboBox, customCategoryField,
+                        civilizationLabel, civilizationField,
+                        discoveryLocationLabel, discoveryLocationField,
+                        compositionLabel, compositionField,
+                        discoveryDateLabel, discoveryDatePicker,
+                        currentPlaceLabel, currentPlaceField,
+                        widthLabel, widthField,
+                        lengthLabel, lengthField,
+                        heightLabel, heightField,
+                        weightLabel, weightField,
+                        tagsLabel, newTagField, tagsPane,
+                        imagePathLabel, imagePathField,
+                        browseImageButton,
                         saveButton
                 );
-                layout.setPadding(new Insets(10));
 
-                Scene scene = new Scene(layout, 320, 330);
+                scrollPane.setContent(form);
+                Scene scene = new Scene(scrollPane, 420, 700);
                 editStage.setScene(scene);
                 editStage.show();
+
             } else {
                 showAlert("Artifact Not Found", "No artifact found with ID: " + artifactId);
             }
         });
     }
+
 
 
     public void showDeleteArtifactDialog() {
