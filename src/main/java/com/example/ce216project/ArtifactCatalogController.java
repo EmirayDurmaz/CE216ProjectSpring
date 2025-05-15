@@ -81,7 +81,7 @@ public class ArtifactCatalogController {
             if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {
                 JSONArray tagsArray = artifact.getJSONArray("tags");
                 for (int j = 0; j < tagsArray.length(); j++) {
-                    String tag = tagsArray.getString(j).toLowerCase();  // küçük harfe çevir
+                    String tag = tagsArray.getString(j).toLowerCase();
                     tagsSet.add(tag);
                 }
             }
@@ -222,6 +222,8 @@ public class ArtifactCatalogController {
                 extraInfoBox.setSpacing(4);
                 extraInfoBox.setPadding(new Insets(8, 0, 0, 0));
                 extraInfoBox.setVisible(false);
+                extraInfoBox.managedProperty().bind(extraInfoBox.visibleProperty());
+
 
                 TextFlow cat = createBoldTextLine("Category: ", artifact.optString("category", "N/A"));
                 TextFlow civ = createBoldTextLine("Civilization: ", artifact.optString("civilization", "N/A"));
