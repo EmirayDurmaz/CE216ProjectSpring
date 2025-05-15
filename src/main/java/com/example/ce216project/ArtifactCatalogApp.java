@@ -764,14 +764,23 @@ public class ArtifactCatalogApp extends Application {
             try {
                 String content = new String(Files.readAllBytes(file.toPath()));
                 Object json = new org.json.JSONTokener(content).nextValue();
-                JSONArray newArtifacts = json instanceof JSONObject ? new JSONArray().put((JSONObject) json) : (JSONArray) json;
+
+                JSONArray newArtifacts;
+                if (json instanceof JSONObject) {
+
+                    newArtifacts = new JSONArray().put((JSONObject) json);
+                } else if (json instanceof JSONArray) {
+                    newArtifacts = (JSONArray) json;
+                } else {
+                    showAlert("Import Error", "Invalid JSON format.");
+                    return;
+                }
 
                 int addedCount = 0;
                 int skippedCount = 0;
 
                 for (int i = 0; i < newArtifacts.length(); i++) {
                     JSONObject artifact = newArtifacts.getJSONObject(i);
-
 
                     if (!artifact.has("artifactid") || artifact.getString("artifactid").isBlank()) {
                         artifact.put("artifactid", generateUniqueArtifactId());
@@ -791,6 +800,10 @@ public class ArtifactCatalogApp extends Application {
                     showAlert("Duplicate Skipped", skippedCount + " artifact(s) with duplicate ID were skipped.");
                 }
 
+                if (controller != null) {
+                    controller.updateTagList();
+                }
+
                 displayArtifacts(artifacts);
 
             } catch (Exception e) {
@@ -798,6 +811,7 @@ public class ArtifactCatalogApp extends Application {
             }
         }
     }
+
 
 
     private void updateTagListView() {
