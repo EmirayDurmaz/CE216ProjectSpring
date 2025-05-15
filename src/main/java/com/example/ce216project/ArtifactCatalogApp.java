@@ -180,6 +180,7 @@ public class ArtifactCatalogApp extends Application {
     private void showAccessibilityOptions() {
         displayArea.setText("Accessibility: Modify settings for better usability.");
     }
+
     public void showAddArtifactDialog() {
         Stage dialog = new Stage();
         dialog.setTitle("Add Artifact");
@@ -188,51 +189,44 @@ public class ArtifactCatalogApp extends Application {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
 
-        VBox form = new VBox(10); // Aralık 10
+        VBox form = new VBox(10);
         form.setPadding(new Insets(25));
         form.setAlignment(Pos.TOP_LEFT);
         form.setStyle("-fx-background-color: #F5F5F5;");
 
         String textFieldStyle = "-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;";
 
-        // Artifact ID
         Label idLabel = new Label("Artifact ID");
         TextField idField = new TextField();
         idField.setEditable(false);
         idField.setText(generateUniqueArtifactId());
         idField.setStyle(textFieldStyle);
 
-        // Artifact Name
         Label nameLabel = new Label("Artifact Name");
         TextField nameField = new TextField();
         nameField.setPromptText("Artifact Name");
         nameField.setStyle(textFieldStyle);
 
-        // Category
         Label categoryLabel = new Label("Category");
         TextField categoryField = new TextField();
         categoryField.setPromptText("Category");
         categoryField.setStyle(textFieldStyle);
 
-        // Civilization
         Label civilizationLabel = new Label("Civilization");
         TextField civilizationField = new TextField();
         civilizationField.setPromptText("Civilization");
         civilizationField.setStyle(textFieldStyle);
 
-        // Discovery Location
         Label discoveryLocationLabel = new Label("Discovery Location");
         TextField discoveryLocationField = new TextField();
         discoveryLocationField.setPromptText("Discovery Location");
         discoveryLocationField.setStyle(textFieldStyle);
 
-        // Composition
         Label compositionLabel = new Label("Composition");
         TextField compositionField = new TextField();
         compositionField.setPromptText("Composition");
         compositionField.setStyle(textFieldStyle);
 
-        // Discovery Date
         Label discoveryDateLabel = new Label("Discovery Date");
         DatePicker discoveryDatePicker = new DatePicker();
         discoveryDatePicker.setPromptText("Discovery Date");
@@ -240,43 +234,63 @@ public class ArtifactCatalogApp extends Application {
                 "-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8; -fx-font-size: 12px; -fx-pref-height: 30px;"
         );
 
-        // Current Place
         Label currentPlaceLabel = new Label("Current Place");
         TextField currentPlaceField = new TextField();
         currentPlaceField.setPromptText("Current Place");
         currentPlaceField.setStyle(textFieldStyle);
 
-        // Width (cm)
         Label widthLabel = new Label("Width (cm)");
         TextField widthField = new TextField();
         widthField.setPromptText("Width (cm)");
         widthField.setStyle(textFieldStyle);
 
-        // Length (cm)
         Label lengthLabel = new Label("Length (cm)");
         TextField lengthField = new TextField();
         lengthField.setPromptText("Length (cm)");
         lengthField.setStyle(textFieldStyle);
 
-        // Height (cm)
         Label heightLabel = new Label("Height (cm)");
         TextField heightField = new TextField();
         heightField.setPromptText("Height (cm)");
         heightField.setStyle(textFieldStyle);
 
-        // Weight (kg)
         Label weightLabel = new Label("Weight (kg)");
         TextField weightField = new TextField();
         weightField.setPromptText("Weight (kg)");
         weightField.setStyle(textFieldStyle);
 
-        // Tags
-        Label tagsLabel = new Label("Tags (comma separated)");
-        TextField tagsField = new TextField();
-        tagsField.setPromptText("Tags (comma separated)");
-        tagsField.setStyle(textFieldStyle);
+        Label tagsLabel = new Label("Tags");
+        FlowPane tagsPane = new FlowPane();
+        tagsPane.setHgap(5);
+        tagsPane.setVgap(5);
+        tagsPane.setPrefWrapLength(300);
 
-        // Image Path
+        TextField newTagField = new TextField();
+        newTagField.setPromptText("Add tag and press Enter");
+        newTagField.setStyle(textFieldStyle);
+
+        Set<String> currentTags = new HashSet<>();
+
+        newTagField.setOnAction(e -> {
+            String newTag = newTagField.getText().trim().toLowerCase();
+
+            if (newTag.isEmpty()) {
+                return;
+            }
+
+            if (currentTags.contains(newTag)) {
+                showAlert("Duplicate Tag", "This tag already exists!");
+                newTagField.clear();
+                return;
+            }
+
+            currentTags.add(newTag);
+            Label tagLabel = createTagLabel(newTag, currentTags, tagsPane);
+            tagsPane.getChildren().add(tagLabel);
+
+            newTagField.clear();
+        });
+
         Label imagePathLabel = new Label("Image Path");
         TextField imagePathField = new TextField();
         imagePathField.setPromptText("Image Path");
@@ -300,36 +314,14 @@ public class ArtifactCatalogApp extends Application {
         addButton.setMaxWidth(Double.MAX_VALUE);
         addButton.setPrefHeight(40);
         addButton.setStyle("""
-    -fx-background-color: #6C63FF;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-background-radius: 10;
-    -fx-font-size: 14px;
-    -fx-padding: 8 16 8 16;
-""");
+        -fx-background-color: #6C63FF;
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-background-radius: 10;
+        -fx-font-size: 14px;
+        -fx-padding: 8 16 8 16;
+    """);
 
-
-        addButton.setOnAction(e -> {
-        });
-
-        form.getChildren().addAll(
-                idLabel, idField,
-                nameLabel, nameField,
-                categoryLabel, categoryField,
-                civilizationLabel, civilizationField,
-                discoveryLocationLabel, discoveryLocationField,
-                compositionLabel, compositionField,
-                discoveryDateLabel, discoveryDatePicker,
-                currentPlaceLabel, currentPlaceField,
-                widthLabel, widthField,
-                lengthLabel, lengthField,
-                heightLabel, heightField,
-                weightLabel, weightField,
-                tagsLabel, tagsField,
-                imagePathLabel, imagePathField,
-                browseImageButton,
-                addButton
-        );
         addButton.setOnAction(e -> {
             String artifactId = idField.getText().trim();
 
@@ -378,12 +370,8 @@ public class ArtifactCatalogApp extends Application {
             }
 
             JSONArray tagsArray = new JSONArray();
-            String tagsInput = tagsField.getText().trim();
-            if (!tagsInput.isEmpty()) {
-                String[] tags = tagsInput.split(",");
-                for (String tag : tags) {
-                    tagsArray.put(tag.trim());
-                }
+            for (String tag : currentTags) {
+                tagsArray.put(tag);
             }
             newArtifact.put("tags", tagsArray);
 
@@ -399,13 +387,49 @@ public class ArtifactCatalogApp extends Application {
             dialog.close();
         });
 
-
+        form.getChildren().addAll(
+                idLabel, idField,
+                nameLabel, nameField,
+                categoryLabel, categoryField,
+                civilizationLabel, civilizationField,
+                discoveryLocationLabel, discoveryLocationField,
+                compositionLabel, compositionField,
+                discoveryDateLabel, discoveryDatePicker,
+                currentPlaceLabel, currentPlaceField,
+                widthLabel, widthField,
+                lengthLabel, lengthField,
+                heightLabel, heightField,
+                weightLabel, weightField,
+                tagsLabel, newTagField, tagsPane,
+                imagePathLabel, imagePathField,
+                browseImageButton,
+                addButton
+        );
 
         scrollPane.setContent(form);
         Scene scene = new Scene(scrollPane, 420, 600);
         dialog.setScene(scene);
         dialog.show();
     }
+
+    private Label createTagLabel(String tag, Set<String> tagsSet, FlowPane container) {
+        Label label = new Label(tag + "  ✕");
+        label.setStyle("""
+        -fx-background-color: #6C63FF;
+        -fx-text-fill: white;
+        -fx-padding: 4 8 4 8;
+        -fx-background-radius: 10;
+        -fx-cursor: hand;
+    """);
+
+        label.setOnMouseClicked(event -> {
+            tagsSet.remove(tag);
+            container.getChildren().remove(label);
+        });
+
+        return label;
+    }
+
 
 
     private boolean isArtifactIdExists(String artifactId) {
