@@ -323,6 +323,25 @@ public class ArtifactCatalogApp extends Application {
     """);
 
         addButton.setOnAction(e -> {
+
+            if (!widthField.getText().trim().isEmpty() && !isNumeric(widthField.getText().trim())) {
+                showAlert("Input Error", "Width must be a valid number.");
+                return;
+            }
+            if (!lengthField.getText().trim().isEmpty() && !isNumeric(lengthField.getText().trim())) {
+                showAlert("Input Error", "Length must be a valid number.");
+                return;
+            }
+            if (!heightField.getText().trim().isEmpty() && !isNumeric(heightField.getText().trim())) {
+                showAlert("Input Error", "Height must be a valid number.");
+                return;
+            }
+            if (!weightField.getText().trim().isEmpty() && !isNumeric(weightField.getText().trim())) {
+                showAlert("Input Error", "Weight must be a valid number.");
+                return;
+            }
+
+
             String artifactId = idField.getText().trim();
 
             if (artifactId.isEmpty()) {
@@ -346,28 +365,14 @@ public class ArtifactCatalogApp extends Application {
             newArtifact.put("currentplace", currentPlaceField.getText().trim().isEmpty() ? "Unknown" : currentPlaceField.getText().trim());
 
             JSONObject dimensions = new JSONObject();
-            try {
-                dimensions.put("width", Integer.parseInt(widthField.getText().trim()));
-            } catch (Exception ex) {
-                dimensions.put("width", 0);
-            }
-            try {
-                dimensions.put("length", Integer.parseInt(lengthField.getText().trim()));
-            } catch (Exception ex) {
-                dimensions.put("length", 0);
-            }
-            try {
-                dimensions.put("height", Integer.parseInt(heightField.getText().trim()));
-            } catch (Exception ex) {
-                dimensions.put("height", 0);
-            }
-            newArtifact.put("dimensions", dimensions);
+            dimensions.put("width", widthField.getText().trim().isEmpty() ? 0.0 : Double.parseDouble(widthField.getText().trim()));
+            dimensions.put("length", lengthField.getText().trim().isEmpty() ? 0.0 : Double.parseDouble(lengthField.getText().trim()));
+            dimensions.put("height", heightField.getText().trim().isEmpty() ? 0.0 : Double.parseDouble(heightField.getText().trim()));
 
-            try {
-                newArtifact.put("weight", Integer.parseInt(weightField.getText().trim()));
-            } catch (Exception ex) {
-                newArtifact.put("weight", 0);
-            }
+            newArtifact.put("weight", weightField.getText().trim().isEmpty() ? 0.0 : Double.parseDouble(weightField.getText().trim()));
+
+
+            newArtifact.put("weight", weightField.getText().trim().isEmpty() ? 0 : Integer.parseInt(weightField.getText().trim()));
 
             JSONArray tagsArray = new JSONArray();
             for (String tag : currentTags) {
@@ -386,6 +391,7 @@ public class ArtifactCatalogApp extends Application {
 
             dialog.close();
         });
+
 
         form.getChildren().addAll(
                 idLabel, idField,
@@ -548,6 +554,19 @@ public class ArtifactCatalogApp extends Application {
             }
         });
     }
+
+    private boolean isNumeric(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 
     private JSONObject findArtifactById(String artifactId) {
         for (int i = 0; i < artifacts.length(); i++) {

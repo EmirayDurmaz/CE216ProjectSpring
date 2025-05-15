@@ -229,7 +229,26 @@ public class ArtifactCatalogController {
                 TextFlow date = createBoldTextLine("Discovery Date: ", artifact.optString("discoverydate", "Unknown"));
                 TextFlow place = createBoldTextLine("Current Place: ", artifact.optString("currentplace", "Unknown"));
 
-                extraInfoBox.getChildren().addAll(cat, civ, comp, date, place);
+
+                JSONObject dimensions = artifact.optJSONObject("dimensions");
+                String dimValues;
+                if (dimensions != null) {
+                    dimValues = String.format("Width %.2f cm, Length %.2f cm, Height %.2f cm",
+                            dimensions.optDouble("width", 0.0),
+                            dimensions.optDouble("length", 0.0),
+                            dimensions.optDouble("height", 0.0));
+                } else {
+                    dimValues = "N/A";
+                }
+                TextFlow dimensionsFlow = createBoldTextLine("Dimensions: ", dimValues);
+
+
+                double weight = artifact.optDouble("weight", 0.0);
+                TextFlow weightFlow = createBoldTextLine("Weight: ", String.format("%.2f kg", weight));
+
+
+                extraInfoBox.getChildren().addAll(cat, civ, comp, date, place, dimensionsFlow, weightFlow);
+                ;
 
                 detailButton.setOnAction(e -> extraInfoBox.setVisible(!extraInfoBox.isVisible()));
 

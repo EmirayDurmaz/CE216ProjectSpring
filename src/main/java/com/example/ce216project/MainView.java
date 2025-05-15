@@ -1,3 +1,4 @@
+/*
 package com.example.ce216project;
 
 import javafx.application.Application;
@@ -30,3 +31,5 @@ public class MainView extends Application {
         launch(args);
     }
 }
+
+ */
