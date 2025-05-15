@@ -68,7 +68,7 @@ public class ArtifactCatalogController {
         btnBackToAll.setVisible(false);
     }
 
-    protected void updateTagList() {
+    public void updateTagList() {
         if (app == null) return;
 
         allTags.clear();
@@ -92,7 +92,7 @@ public class ArtifactCatalogController {
 
         allTags.addAll(sortedTags);
 
-        System.out.println("Loaded tags: " + allTags);  // debug için
+        System.out.println("Loaded tags: " + allTags);
     }
 
 
