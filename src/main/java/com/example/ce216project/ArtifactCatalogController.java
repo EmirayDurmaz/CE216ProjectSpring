@@ -155,27 +155,34 @@ public class ArtifactCatalogController {
         Platform.runLater(() -> {
             artifactContainer.getChildren().clear();
 
+            String defaultImagePath = getClass().getResource("/images/default_216.jpg").toExternalForm();
+
             for (int i = 0; i < artifacts.length(); i++) {
                 JSONObject artifact = artifacts.getJSONObject(i);
 
                 VBox card = new VBox();
                 card.setPrefWidth(260);
                 card.setStyle("""
-                    -fx-background-color: white;
-                    -fx-background-radius: 12;
-                    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0.3, 0, 2);
-                """);
+                -fx-background-color: white;
+                -fx-background-radius: 12;
+                -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0.3, 0, 2);
+            """);
 
-                String imagePath = artifact.optString("image", "file:images/artifact_default.jpg");
-                if (!imagePath.startsWith("file:") && !imagePath.startsWith("http")) {
-                    imagePath = "file:" + imagePath;
+                String imagePath = artifact.optString("image", "").trim();
+
+                if (imagePath.isEmpty() || imagePath.equals("null")) {
+                    imagePath = defaultImagePath;
+                } else {
+                    if (!imagePath.startsWith("file:") && !imagePath.startsWith("http")) {
+                        imagePath = "file:" + imagePath;
+                    }
                 }
 
                 ImageView imageView = new ImageView();
                 try {
-                    imageView.setImage(new Image(imagePath));
+                    imageView.setImage(new Image(imagePath, false)); // cache kapalı
                 } catch (Exception e) {
-                    imageView.setImage(new Image("file:images/artifact_default.jpg"));
+                    imageView.setImage(new Image(defaultImagePath, false));
                 }
 
                 imageView.setFitWidth(260);
@@ -194,13 +201,13 @@ public class ArtifactCatalogController {
 
                 Label idLabel = new Label("ID: " + artifact.optString("artifactid", "N/A"));
                 idLabel.setStyle("""
-                    -fx-font-size: 10px;
-                    -fx-background-color: #ECEFF1;
-                    -fx-text-fill: #37474F;
-                    -fx-padding: 2 6 2 6;
-                    -fx-background-radius: 6;
-                    -fx-alignment: center-right;
-                """);
+                -fx-font-size: 10px;
+                -fx-background-color: #ECEFF1;
+                -fx-text-fill: #37474F;
+                -fx-padding: 2 6 2 6;
+                -fx-background-radius: 6;
+                -fx-alignment: center-right;
+            """);
 
                 StringBuilder tagsText = new StringBuilder("🏷 Tags: ");
                 if (artifact.has("tags") && artifact.get("tags") instanceof JSONArray) {
@@ -212,22 +219,22 @@ public class ArtifactCatalogController {
                 }
                 Label tagsLabel = new Label(tagsText.toString());
                 tagsLabel.setStyle("""
-                    -fx-font-size: 13px;
-                    -fx-font-weight: bold;
-                    -fx-text-fill: #37474F;
-                """);
+                -fx-font-size: 13px;
+                -fx-font-weight: bold;
+                -fx-text-fill: #37474F;
+            """);
                 tagsLabel.setWrapText(true);
 
                 Button detailButton = new Button("Details");
                 detailButton.setStyle("""
-                    -fx-background-color: #6C63FF;
-                    -fx-text-fill: white;
-                    -fx-font-size: 11px;
-                    -fx-padding: 2 6 2 6;
-                    -fx-background-radius: 4;
-                    -fx-border-radius: 4;
-                    -fx-effect: none;
-                """);
+                -fx-background-color: #6C63FF;
+                -fx-text-fill: white;
+                -fx-font-size: 11px;
+                -fx-padding: 2 6 2 6;
+                -fx-background-radius: 4;
+                -fx-border-radius: 4;
+                -fx-effect: none;
+            """);
 
                 VBox extraInfoBox = new VBox();
                 extraInfoBox.setSpacing(4);
@@ -235,13 +242,11 @@ public class ArtifactCatalogController {
                 extraInfoBox.setVisible(false);
                 extraInfoBox.managedProperty().bind(extraInfoBox.visibleProperty());
 
-
                 TextFlow cat = createBoldTextLine("Category: ", artifact.optString("category", "N/A"));
                 TextFlow civ = createBoldTextLine("Civilization: ", artifact.optString("civilization", "N/A"));
                 TextFlow comp = createBoldTextLine("Composition: ", artifact.optString("composition", "Unknown"));
                 TextFlow date = createBoldTextLine("Discovery Date: ", artifact.optString("discoverydate", "Unknown"));
                 TextFlow place = createBoldTextLine("Current Place: ", artifact.optString("currentplace", "Unknown"));
-
 
                 JSONObject dimensions = artifact.optJSONObject("dimensions");
                 String dimValues;
@@ -255,13 +260,10 @@ public class ArtifactCatalogController {
                 }
                 TextFlow dimensionsFlow = createBoldTextLine("Dimensions: ", dimValues);
 
-
                 double weight = artifact.optDouble("weight", 0.0);
                 TextFlow weightFlow = createBoldTextLine("Weight: ", String.format("%.2f kg", weight));
 
-
                 extraInfoBox.getChildren().addAll(cat, civ, comp, date, place, dimensionsFlow, weightFlow);
-                ;
 
                 detailButton.setOnAction(e -> extraInfoBox.setVisible(!extraInfoBox.isVisible()));
 
@@ -274,6 +276,7 @@ public class ArtifactCatalogController {
             }
         });
     }
+
 
     private TextFlow createBoldTextLine(String label, String value) {
         Text labelBold = new Text(label);

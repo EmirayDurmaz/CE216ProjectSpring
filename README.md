@@ -36,7 +36,7 @@
 
 -You can import or export your files.
 
--Lastly if you feel lost or you need help, you can fild detailed information at our help center.
+-Lastly if you feel lost or you need help, you can find detailed information at our help center.
 
 3. ## Contributors
 - Yasemin Güler koçar

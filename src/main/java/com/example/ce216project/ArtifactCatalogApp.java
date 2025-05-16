@@ -304,7 +304,7 @@ public class ArtifactCatalogApp extends Application {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose Image File");
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                    new FileChooser.ExtensionFilter("Image Files", ".png", ".jpg", ".jpeg", ".gif")
             );
             File selectedFile = fileChooser.showOpenDialog(dialog);
             if (selectedFile != null) {
@@ -621,7 +621,7 @@ public class ArtifactCatalogApp extends Application {
                     FileChooser fileChooser = new FileChooser();
                     fileChooser.setTitle("Choose Image File");
                     fileChooser.getExtensionFilters().addAll(
-                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                            new FileChooser.ExtensionFilter("Image Files", ".png", ".jpg", ".jpeg", ".gif")
                     );
                     File selectedFile = fileChooser.showOpenDialog(editStage);
                     if (selectedFile != null) {
@@ -1153,5 +1153,5 @@ public class ArtifactCatalogApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
-    }
+}
 }
