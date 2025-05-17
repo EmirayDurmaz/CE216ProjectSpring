@@ -14,6 +14,9 @@
       "height": 2
     },
     "weight": 150.0,
-    "tags": ["egyptian", "amulet", "gold"]
+    "tags": ["egyptian", "amulet", "gold"],
+    "image": "/images/goldenAmulet_216.jpg"
+
+
   }
 ]

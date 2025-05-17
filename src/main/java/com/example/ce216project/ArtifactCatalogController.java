@@ -23,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 
 public class ArtifactCatalogController {
@@ -155,6 +156,7 @@ public class ArtifactCatalogController {
         Platform.runLater(() -> {
             artifactContainer.getChildren().clear();
 
+            // Default resim resources içindeki gerçek dosya yolu (projede olmalı)
             String defaultImagePath = getClass().getResource("/images/default_216.jpg").toExternalForm();
 
             for (int i = 0; i < artifacts.length(); i++) {
@@ -168,29 +170,42 @@ public class ArtifactCatalogController {
                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 8, 0.3, 0, 2);
             """);
 
-                String imagePath = artifact.optString("image", "").trim();
-
-                if (imagePath.isEmpty() || imagePath.equals("null")) {
-                    imagePath = defaultImagePath;
-                } else {
-                    if (!imagePath.startsWith("file:") && !imagePath.startsWith("http")) {
-                        imagePath = "file:" + imagePath;
-                    }
+                String imagePath = "";
+                if (artifact.has("image") && !artifact.isNull("image")) {
+                    imagePath = artifact.optString("image", "").trim();
                 }
 
-                ImageView imageView = new ImageView();
+                Image image = null;
                 try {
-                    imageView.setImage(new Image(imagePath, false)); // cache kapalı
+                    if (imagePath.isEmpty() || imagePath.equalsIgnoreCase("null")) {
+                        // Resim yoksa default resim
+                        image = new Image(defaultImagePath);
+                    } else {
+                        if (imagePath.startsWith("file:") || imagePath.startsWith("http")) {
+                            // Harici dosya veya web URL'si ise direkt yükle
+                            image = new Image(imagePath);
+                        } else {
+                            // Kaynak içinden yüklemek için path'i URL'ye çevir
+                            String resourceURL = getClass().getResource(imagePath) != null ? getClass().getResource(imagePath).toExternalForm() : null;
+                            if (resourceURL != null) {
+                                image = new Image(resourceURL);
+                            } else {
+                                System.err.println("Image resource not found: " + imagePath);
+                                image = new Image(defaultImagePath);
+                            }
+                        }
+                    }
                 } catch (Exception e) {
-                    imageView.setImage(new Image(defaultImagePath, false));
+                    e.printStackTrace();
+                    image = new Image(defaultImagePath);
                 }
 
+                ImageView imageView = new ImageView(image);
                 imageView.setFitWidth(260);
                 imageView.setFitHeight(180);
                 imageView.setPreserveRatio(true);
                 imageView.setSmooth(true);
                 imageView.setCache(true);
-
                 imageView.setStyle("-fx-alignment: center;");
 
                 Label name = new Label("🏺 " + artifact.optString("artifactname", "N/A"));
@@ -276,6 +291,7 @@ public class ArtifactCatalogController {
             }
         });
     }
+
 
 
     private TextFlow createBoldTextLine(String label, String value) {

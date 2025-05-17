@@ -20,10 +20,8 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class ArtifactCatalogApp extends Application {
@@ -62,18 +60,15 @@ public class ArtifactCatalogApp extends Application {
 
 
     private void loadDefaultArtifacts() {
-        String[] defaultFiles = {
-                "src/main/resources/artifacts1.json",
-                "src/main/resources/artifacts2.json",
-                "src/main/resources/artifacts3.json"
-        };
-
+        String[] defaultFiles = { "/artifacts1.json", "/artifacts2.json", "/artifacts3.json" };
         try {
-            for (String path : defaultFiles) {
-                File file = new File(path);
-                if (file.exists()) {
-                    String content = new String(Files.readAllBytes(file.toPath()));
+            for (String resourcePath : defaultFiles) {
+                InputStream is = getClass().getResourceAsStream(resourcePath);
+                if (is != null) {
+                    String content = new BufferedReader(new InputStreamReader(is))
+                            .lines().collect(Collectors.joining("\n"));
                     JSONArray fileArtifacts = new JSONArray(content);
+
                     for (int i = 0; i < fileArtifacts.length(); i++) {
                         JSONObject artifact = fileArtifacts.getJSONObject(i);
                         String id = artifact.optString("artifactid", "").trim();
@@ -86,13 +81,19 @@ public class ArtifactCatalogApp extends Application {
                             existingIds.add(id);
                         }
                     }
+                } else {
+                    System.out.println("Resource not found: " + resourcePath);
                 }
             }
+
             displayArtifacts(artifacts);
+
         } catch (Exception e) {
-            System.out.println("Error loading default artifacts: " + e.getMessage());
-        }
-    }
+            e.printStackTrace();
+}
+}
+
+
 
     private int nextArtifactId = 1000;
     private String generateUniqueArtifactId() {
@@ -304,13 +305,15 @@ public class ArtifactCatalogApp extends Application {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose Image File");
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image Files", ".png", ".jpg", ".jpeg", ".gif")
+                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
             );
-            File selectedFile = fileChooser.showOpenDialog(dialog);
+            Stage currentStage = (Stage) browseImageButton.getScene().getWindow();
+            File selectedFile = fileChooser.showOpenDialog(currentStage);
             if (selectedFile != null) {
                 imagePathField.setText(selectedFile.toURI().toString());
             }
         });
+
 
         Button addButton = new Button("➕ Add Artifact");
         addButton.setMaxWidth(Double.MAX_VALUE);
@@ -613,7 +616,7 @@ public class ArtifactCatalogApp extends Application {
 
                 Label imagePathLabel = new Label("Image Path");
                 TextField imagePathField = new TextField(artifact.optString("image", ""));
-                imagePathField.setEditable(false);
+                imagePathField.setEditable(true);  // Editable olmalı
                 imagePathField.setStyle(textFieldStyle);
 
                 Button browseImageButton = new Button("Select Image");
@@ -621,13 +624,15 @@ public class ArtifactCatalogApp extends Application {
                     FileChooser fileChooser = new FileChooser();
                     fileChooser.setTitle("Choose Image File");
                     fileChooser.getExtensionFilters().addAll(
-                            new FileChooser.ExtensionFilter("Image Files", ".png", ".jpg", ".jpeg", ".gif")
+                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
                     );
                     File selectedFile = fileChooser.showOpenDialog(editStage);
                     if (selectedFile != null) {
+                        // file: ile başlayan URI formatında set et
                         imagePathField.setText(selectedFile.toURI().toString());
                     }
                 });
+
 
                 Button saveButton = new Button("Save");
                 saveButton.setMaxWidth(Double.MAX_VALUE);
