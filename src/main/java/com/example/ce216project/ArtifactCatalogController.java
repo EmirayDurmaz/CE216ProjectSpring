@@ -156,7 +156,6 @@ public class ArtifactCatalogController {
         Platform.runLater(() -> {
             artifactContainer.getChildren().clear();
 
-            // Default resim resources içindeki gerçek dosya yolu (projede olmalı)
             String defaultImagePath = getClass().getResource("/images/default_216.jpg").toExternalForm();
 
             for (int i = 0; i < artifacts.length(); i++) {
@@ -178,14 +177,11 @@ public class ArtifactCatalogController {
                 Image image = null;
                 try {
                     if (imagePath.isEmpty() || imagePath.equalsIgnoreCase("null")) {
-                        // Resim yoksa default resim
                         image = new Image(defaultImagePath);
                     } else {
                         if (imagePath.startsWith("file:") || imagePath.startsWith("http")) {
-                            // Harici dosya veya web URL'si ise direkt yükle
                             image = new Image(imagePath);
                         } else {
-                            // Kaynak içinden yüklemek için path'i URL'ye çevir
                             String resourceURL = getClass().getResource(imagePath) != null ? getClass().getResource(imagePath).toExternalForm() : null;
                             if (resourceURL != null) {
                                 image = new Image(resourceURL);

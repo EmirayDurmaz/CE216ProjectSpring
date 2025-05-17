@@ -616,7 +616,7 @@ public class ArtifactCatalogApp extends Application {
 
                 Label imagePathLabel = new Label("Image Path");
                 TextField imagePathField = new TextField(artifact.optString("image", ""));
-                imagePathField.setEditable(true);  // Editable olmalı
+                imagePathField.setEditable(true);
                 imagePathField.setStyle(textFieldStyle);
 
                 Button browseImageButton = new Button("Select Image");
@@ -628,7 +628,7 @@ public class ArtifactCatalogApp extends Application {
                     );
                     File selectedFile = fileChooser.showOpenDialog(editStage);
                     if (selectedFile != null) {
-                        // file: ile başlayan URI formatında set et
+
                         imagePathField.setText(selectedFile.toURI().toString());
                     }
                 });
@@ -1118,10 +1118,10 @@ public class ArtifactCatalogApp extends Application {
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
 
-        VBox.setVgrow(tabPane, Priority.ALWAYS); // TabPane tüm alanı kaplasın
+        VBox.setVgrow(tabPane, Priority.ALWAYS);
         VBox.setVgrow(closeButton, Priority.NEVER);
 
-        Scene scene = new Scene(layout, 700, 550); // Daha geniş bir pencere
+        Scene scene = new Scene(layout, 700, 550);
         helpStage.setScene(scene);
         helpStage.show();
     }
@@ -1140,7 +1140,7 @@ public class ArtifactCatalogApp extends Application {
         -fx-font-size: 13px;
         -fx-text-fill: #37474F;
     """);
-        area.setPrefHeight(400); // Yüksekliği ayarla
+        area.setPrefHeight(400);
         return area;
     }
 
