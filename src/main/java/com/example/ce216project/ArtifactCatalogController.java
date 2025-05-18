@@ -196,6 +196,7 @@ public class ArtifactCatalogController {
                     image = new Image(defaultImagePath);
                 }
 
+
                 ImageView imageView = new ImageView(image);
                 imageView.setFitWidth(260);
                 imageView.setFitHeight(180);
