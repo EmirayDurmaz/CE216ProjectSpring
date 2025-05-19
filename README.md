@@ -18,7 +18,7 @@
 
 ## Usage
 2.1 **Using the Installer**:
-   - Download the `ArtifactCatalogSetup.exe` from releases
+   - Download the `ArtifactCatalogue.exe` from releases
    - Run the installer and follow the instructions
    - A desktop shortcut will be created automatically
 
